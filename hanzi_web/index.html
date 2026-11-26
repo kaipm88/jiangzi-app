@@ -14,7 +14,9 @@
   <link rel="manifest" href="manifest.json">
   <script>
     if (/Android/i.test(navigator.userAgent) || window.JiangZiAndroid) {
-      document.documentElement.classList.add('is-android');
+      document.documentElement.classList.add('is-android', 'is-mobile-app');
+    } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent) || window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+      document.documentElement.classList.add('is-mobile-app');
     }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -516,9 +518,28 @@
       contain-intrinsic-size: auto 148px;
     }
 
+    /* Explicit Sliding Pill Widths (Zero-chance of collapsed stripe!) */
+    #nav-pill { width: calc((100% - 8px) / 4); }
+    #py-seg-pill { width: calc((100% - 6px) / 4); }
+    #font-seg-pill, #acc-seg-pill { width: calc((100% - 6px) / 2); }
+
+    html.is-mobile-app body { padding: 0 !important; }
+    html.is-mobile-app #app-wrapper {
+      max-width: 100% !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
     /* ================================================================= */
     /* ANDROID 120FPS OPTICAL GLASS ENGINE (Zero backdrop-filter lag!)   */
     /* ================================================================= */
+    html.is-android [class*="backdrop-blur"] {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
     html.is-android .glass-card {
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
@@ -723,10 +744,10 @@
     }
   </style>
 </head>
-<body class="bg-slate-200/70 font-vietnam text-slate-900 h-[100dvh] overflow-hidden flex flex-col items-center justify-center p-0 sm:p-3 select-none">
+<body class="bg-slate-200/70 font-vietnam text-slate-900 h-[100dvh] overflow-hidden flex flex-col items-center justify-center p-0 lg:p-3 select-none">
 
-  <!-- App Shell Container (Apple Glass — Locked 100dvh so Bottom Nav & Headers stay pinned!) -->
-  <div id="app-wrapper" class="w-full sm:max-w-xl h-[100dvh] sm:h-[880px] sm:max-h-[94vh] apple-bg sm:rounded-[40px] sm:shadow-[0_24px_64px_rgba(15,23,42,0.16)] sm:border-[6px] sm:border-slate-900 flex flex-col overflow-hidden relative">
+  <!-- App Shell Container (100% Fullscreen on Mobile/Tablet, Phone Frame ONLY on Desktop >= 1024px) -->
+  <div id="app-wrapper" class="w-full lg:max-w-[430px] h-[100dvh] lg:h-[880px] lg:max-h-[94vh] apple-bg lg:rounded-[40px] lg:shadow-[0_24px_64px_rgba(15,23,42,0.16)] lg:border-[6px] lg:border-slate-900 flex flex-col overflow-hidden relative">
 
     <!-- iOS 18 DYNAMIC ISLAND TOAST PILL -->
     <div class="ios-safe-island absolute top-2.5 inset-x-0 z-50 flex justify-center pointer-events-none px-4">
@@ -1189,7 +1210,7 @@
         <div class="shrink-0 space-y-2.5 pb-3">
           <!-- Authentic iOS 18 Frosted Segmented Control: Phụ âm / Nguyên âm / 4 Thanh / Phản xạ -->
           <div class="relative grid grid-cols-4 ios-segmented text-[11px] font-semibold">
-            <div id="py-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%-6px)/4)] pointer-events-none"></div>
+            <div id="py-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%_-_6px)/4)] pointer-events-none"></div>
             <button onclick="switchPinyinTab('initials')" id="py-tab-initials" class="relative z-10 py-1.5 rounded-[11px] text-[#007AFF] font-bold transition-colors">
               Phụ âm
             </button>
@@ -1300,7 +1321,7 @@
       <!-- FLOATING iOS 18 LIQUID GLASS PILL TAB BAR (ZERO-DRIFT SLIDING THUMB) -->
       <div class="ios-safe-dock absolute bottom-3 inset-x-4 z-30">
         <nav class="relative glass-nav rounded-[30px] p-[4px] grid grid-cols-4">
-          <div id="nav-pill" class="spring-slide glass-pill-active absolute top-[4px] bottom-[4px] left-[4px] w-[calc((100%-8px)/4)] rounded-[26px] pointer-events-none"></div>
+          <div id="nav-pill" class="spring-slide glass-pill-active absolute top-[4px] bottom-[4px] left-[4px] w-[calc((100%_-_8px)/4)] rounded-[26px] pointer-events-none"></div>
           <button onclick="switchHomeTab('today')" id="nav-today" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#007AFF] font-semibold text-[10px] tracking-[-0.01em] transition-colors">
             <svg class="w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6.5h-5V21H4a1 1 0 0 1-1-1v-9.5z"/></svg>
             <span>Hôm nay</span>
@@ -1351,7 +1372,7 @@
           </div>
 
           <div class="relative grid grid-cols-2 ios-segmented text-[11px] font-semibold shrink-0 w-[88px]">
-            <div id="font-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%-6px)/2)] pointer-events-none"></div>
+            <div id="font-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%_-_6px)/2)] pointer-events-none"></div>
             <button onclick="setFontStyle('sans')" id="btn-font-sans" class="relative z-10 py-1 text-center text-[#007AFF] font-bold transition-colors">Sans</button>
             <button onclick="setFontStyle('kaiti')" id="btn-font-kaiti" class="relative z-10 py-1 text-center text-[#3C3C43]/75 font-medium transition-colors">Khải</button>
           </div>
@@ -1578,7 +1599,7 @@
 
         <!-- 2-TAB SEGMENTED CONTROL -->
         <div class="relative grid grid-cols-2 ios-segmented text-xs font-bold">
-          <div id="acc-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%-6px)/2)] pointer-events-none"></div>
+          <div id="acc-seg-pill" class="ios-seg-thumb absolute top-[3px] bottom-[3px] left-[3px] w-[calc((100%_-_6px)/2)] pointer-events-none"></div>
           <button onclick="switchAccountSubTab('progress')" id="acc-tab-progress" class="relative z-10 py-1.5 rounded-[11px] text-[#007AFF] font-bold transition-colors">
             📊 Tiến độ & Sổ tay
           </button>
