@@ -3,8 +3,11 @@ package vn.donggiang.jiangzi
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.view.HapticFeedbackConstants
+import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -13,7 +16,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.webkit.WebViewAssetLoader
 import org.json.JSONObject
@@ -24,30 +29,35 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private var ttsReady = false
     private val prefsName = "JiangZiStorageBackup_v1"
+    private var safeTopPx = 0
+    private var safeBottomPx = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Clean status & navigation bar styling matching JiangZi themes
-        window.statusBarColor = Color.parseColor("#EAF0F8")
-        window.navigationBarColor = Color.parseColor("#EAF0F8")
-        WindowCompat.getInsetsController(window, window.decorView).apply {
+        // True Edge-to-Edge Fullscreen on Android (90Hz/120Hz ready)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightStatusBars = true
             isAppearanceLightNavigationBars = true
         }
 
         tts = TextToSpeech(this, this)
 
-        // Serve bundled hanzi_web over https://appassets.androidplatform.net/assets/www/
-        // so Service Worker, localStorage, and CDN fetches work cleanly with HTTPS origin!
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
 
         webView = WebView(this).apply {
+            // Force GPU Hardware Layer for locked 60/90/120fps scrolling & transitions
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
             setBackgroundColor(Color.parseColor("#EAF0F8"))
             overScrollMode = WebView.OVER_SCROLL_NEVER
+            isVerticalScrollBarEnabled = false
+            isHorizontalScrollBarEnabled = false
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
@@ -69,15 +79,25 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    injectStorageMirror()
+                    applySafeInsetsToCss()
+                    injectDebouncedStorageMirror()
                 }
             }
+        }
+
+        // Measure system status bar / camera cutout & gesture bar and pass to CSS --safe-top / --safe-bottom
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val density = resources.displayMetrics.density.coerceAtLeast(1f)
+            safeTopPx = (bars.top / density).toInt()
+            safeBottomPx = (bars.bottom / density).toInt()
+            applySafeInsetsToCss()
+            WindowInsetsCompat.CONSUMED
         }
 
         setContentView(webView)
         webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
 
-        // Intercept Android Back button / gesture so inner screens close smoothly first
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 webView.evaluateJavascript("window.__jiangziHandleBack && window.__jiangziHandleBack()") { result ->
@@ -91,7 +111,13 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         })
     }
 
-    private fun injectStorageMirror() {
+    private fun applySafeInsetsToCss() {
+        if (!::webView.isInitialized) return
+        val js = "document.documentElement.style.setProperty('--safe-top','${safeTopPx}px');document.documentElement.style.setProperty('--safe-bottom','${safeBottomPx}px');"
+        webView.evaluateJavascript(js, null)
+    }
+
+    private fun injectDebouncedStorageMirror() {
         val prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE)
         val json = JSONObject()
         for ((k, v) in prefs.all) {
@@ -113,18 +139,31 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                 });
                 if (restored) { location.reload(); return; }
               } catch (e) {}
+              var dirty = {};
+              var flushTimer = null;
+              function scheduleFlush() {
+                clearTimeout(flushTimer);
+                flushTimer = setTimeout(function() {
+                  if (window.JiangZiAndroid && window.JiangZiAndroid.kvBatch) {
+                    window.JiangZiAndroid.kvBatch(JSON.stringify(dirty));
+                    dirty = {};
+                  }
+                }, 350);
+              }
               var origSet = Storage.prototype.setItem;
               var origRem = Storage.prototype.removeItem;
               Storage.prototype.setItem = function(k, v) {
                 origSet.call(this, k, v);
-                if (this === window.localStorage && window.JiangZiAndroid) {
-                  window.JiangZiAndroid.kvSet(String(k), String(v));
+                if (this === window.localStorage) {
+                  dirty[String(k)] = String(v);
+                  scheduleFlush();
                 }
               };
               Storage.prototype.removeItem = function(k) {
                 origRem.call(this, k);
-                if (this === window.localStorage && window.JiangZiAndroid) {
-                  window.JiangZiAndroid.kvRem(String(k));
+                if (this === window.localStorage) {
+                  dirty[String(k)] = null;
+                  scheduleFlush();
                 }
               };
             })();
@@ -155,18 +194,30 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         }
 
         @JavascriptInterface
+        fun haptic(kind: String) {
+            runOnUiThread {
+                val constant = when (kind) {
+                    "tick" -> HapticFeedbackConstants.CLOCK_TICK
+                    "light" -> HapticFeedbackConstants.KEYBOARD_TAP
+                    "success" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
+                    "error" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
+                    else -> HapticFeedbackConstants.LONG_PRESS
+                }
+                window.decorView.performHapticFeedback(constant)
+            }
+        }
+
+        @JavascriptInterface
         fun setTheme(theme: String) {
             runOnUiThread {
+                val isLight = theme != "dark"
                 val bgHex = when (theme) {
                     "classic" -> "#F4F6F9"
                     "paper" -> "#F5EFE0"
                     "dark" -> "#0B1120"
                     else -> "#EAF0F8"
                 }
-                val isLight = theme != "dark"
-                val color = Color.parseColor(bgHex)
-                window.statusBarColor = color
-                window.navigationBarColor = color
+                webView.setBackgroundColor(Color.parseColor(bgHex))
                 WindowInsetsControllerCompat(window, window.decorView).apply {
                     isAppearanceLightStatusBars = isLight
                     isAppearanceLightNavigationBars = isLight
@@ -175,19 +226,18 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         }
 
         @JavascriptInterface
-        fun kvSet(key: String, value: String) {
-            getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-                .edit()
-                .putString(key, value)
-                .apply()
-        }
-
-        @JavascriptInterface
-        fun kvRem(key: String) {
-            getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-                .edit()
-                .remove(key)
-                .apply()
+        fun kvBatch(jsonPayload: String) {
+            try {
+                val obj = JSONObject(jsonPayload)
+                val editor = getSharedPreferences(prefsName, Context.MODE_PRIVATE).edit()
+                val keys = obj.keys()
+                while (keys.hasNext()) {
+                    val k = keys.next()
+                    if (obj.isNull(k)) editor.remove(k)
+                    else editor.putString(k, obj.getString(k))
+                }
+                editor.apply()
+            } catch (_: Exception) {}
         }
     }
 }

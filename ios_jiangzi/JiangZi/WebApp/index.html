@@ -12,29 +12,22 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="manifest" href="manifest.json">
+  <script>
+    if (/Android/i.test(navigator.userAgent) || window.JiangZiAndroid) {
+      document.documentElement.classList.add('is-android');
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+  <link rel="stylesheet" href="tailwind.min.css">
+  <script src="vendor/hanzi-writer.min.js"></script>
   <script src="dict_extra.js"></script>
   <script src="data/bank_radicals.js"></script>
   <script src="data/bank_hsk1.js"></script>
   <script src="data/bank_hsk2_9.js"></script>
   <script src="lessons_data.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            vietnam: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Be Vietnam Pro"', 'sans-serif'],
-            hanziSans: ['"PingFang SC"', '"Noto Sans SC"', '"Microsoft YaHei"', 'sans-serif'],
-            hanziKaiti: ['"Kaiti SC"', '"STKaiti"', '"KaiTi"', '"ZCOOL XiaoWei"', 'serif'],
-          }
-        }
-      }
-    }
-  </script>
+  <script src="data/strokes_offline.js" defer></script>
   <style>
     :root {
       --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
@@ -409,12 +402,11 @@
       will-change: transform;
     }
     .depth-layer {
-      transition: transform 0.38s var(--ios-ease), border-radius 0.38s var(--ios-ease);
+      transition: transform 0.34s var(--ios-ease);
       will-change: transform;
     }
     .depth-receded {
-      transform: translate3d(-24%, 0, 0) scale3d(0.96, 0.96, 1);
-      border-radius: 28px;
+      transform: translate3d(-22%, 0, 0) scale3d(0.965, 0.965, 1);
       pointer-events: none;
     }
     .ios-scrim {
@@ -496,18 +488,93 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* iPhone Notch / Dynamic Island & Home Indicator Safe-Area Support */
+    /* iPhone Notch / Dynamic Island & Android Edge-to-Edge Safe-Area Support */
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
     .ios-safe-top {
-      padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem) !important;
+      padding-top: calc(var(--safe-top) + 0.7rem) !important;
     }
     .ios-safe-island {
-      top: calc(env(safe-area-inset-top, 0px) + 0.5rem) !important;
+      top: calc(var(--safe-top) + 0.45rem) !important;
     }
     .ios-safe-dock {
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem) !important;
+      bottom: calc(var(--safe-bottom) + 0.6rem) !important;
+      transition: transform 0.24s var(--ios-ease), opacity 0.2s ease;
+    }
+    body.kb-open .ios-safe-dock {
+      transform: translate3d(0, 140%, 0);
+      opacity: 0;
+      pointer-events: none;
     }
     .ios-safe-practice-bottom {
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem) !important;
+      padding-bottom: calc(var(--safe-bottom) + 0.75rem) !important;
+    }
+    .perf-card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 148px;
+    }
+
+    /* ================================================================= */
+    /* ANDROID 120FPS OPTICAL GLASS ENGINE (Zero backdrop-filter lag!)   */
+    /* ================================================================= */
+    html.is-android .glass-card {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.93) 0%, rgba(245, 250, 255, 0.87) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.06), inset 0 1px 0 #FFFFFF;
+    }
+    html.is-android .ios-header-blur {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(238, 244, 251, 0.96);
+    }
+    html.is-android .glass-nav {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 28px -4px rgba(15, 23, 42, 0.14);
+    }
+    html.is-android .ios-segmented {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(226, 234, 245, 0.85);
+    }
+    html.is-android .ios-search-field {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(255, 255, 255, 0.95);
+    }
+    html.is-android .crystal-canvas {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: linear-gradient(145deg, #FFFFFF 0%, #F6FAFF 100%);
+    }
+    html.is-android .island-pill {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(15, 23, 42, 0.94);
+    }
+    html.is-android #app-wrapper[data-theme="dark"] .glass-card {
+      background: rgba(23, 33, 52, 0.95);
+      border-color: rgba(255, 255, 255, 0.10);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+    }
+    html.is-android #app-wrapper[data-theme="dark"] .ios-header-blur {
+      background: rgba(11, 17, 32, 0.96);
+    }
+    html.is-android #app-wrapper[data-theme="dark"] .glass-nav {
+      background: rgba(19, 28, 46, 0.97);
+    }
+    html.is-android #app-wrapper[data-theme="dark"] .crystal-canvas {
+      background: #131C2E;
+    }
+    html.is-android #app-wrapper[data-theme="paper"] .glass-card,
+    html.is-android #app-wrapper[data-theme="paper"] .glass-nav,
+    html.is-android #app-wrapper[data-theme="paper"] .ios-header-blur {
+      background: #FCF9F1;
     }
 
     /* ============================================= */
@@ -1198,7 +1265,7 @@
           <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5"/></svg>
           </div>
-          <input id="dict-search-input" type="text" oninput="runDictSearch()" placeholder="Tra chữ Hán, Pinyin hoặc nghĩa Việt..." class="ios-search-field w-full pl-9 pr-8 py-2.5 text-[13px] font-medium text-black placeholder:text-[#8E8E93] focus:outline-none"/>
+          <input id="dict-search-input" type="search" inputmode="search" enterkeyhint="search" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="runDictSearch()" placeholder="Tra chữ Hán, Pinyin hoặc nghĩa Việt..." class="ios-search-field w-full pl-9 pr-8 py-2.5 text-[16px] sm:text-[14px] font-medium text-black placeholder:text-[#8E8E93] focus:outline-none"/>
           <button onclick="clearDictSearch()" id="dict-clear-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#8E8E93]/70 text-white text-[9px] font-bold flex items-center justify-center">✕</button>
         </div>
 
@@ -1260,7 +1327,7 @@
     <!-- ====================================================== -->
     <!-- VIEW 3: PRACTICE WRITING SCREEN (iOS 18 PUSH + SWIPE)  -->
     <!-- ====================================================== -->
-    <div id="view-practice" class="zoom-sheet zoom-sheet-hidden absolute inset-0 z-40 apple-bg flex flex-col overflow-y-auto ios-scroll hide-scrollbar">
+    <div id="view-practice" class="zoom-sheet zoom-sheet-hidden absolute inset-0 z-40 apple-bg flex flex-col overflow-hidden">
       
       <header class="sticky top-0 z-30 ios-header-blur ios-safe-top px-4 pt-3 pb-2">
         <div class="flex items-center justify-between gap-2 mb-2">
@@ -1293,7 +1360,7 @@
         <div id="word-strip" class="flex items-center justify-between gap-1.5 overflow-x-auto hide-scrollbar pb-0.5"></div>
       </header>
 
-      <main class="ios-safe-practice-bottom flex-1 px-4 pb-4 flex flex-col justify-between gap-2.5">
+      <main class="ios-safe-practice-bottom flex-1 min-h-0 px-4 pb-3 flex flex-col justify-between gap-2 overflow-hidden">
         
         <div id="word-card" class="glass-card rounded-[22px] p-3 space-y-2">
           <div class="flex items-center justify-between gap-2">
@@ -1344,9 +1411,9 @@
           </div>
         </div>
 
-        <!-- HERO WRITING CANVAS -->
-        <div class="flex-1 flex flex-col items-center justify-center my-auto w-full">
-          <div class="relative w-full max-w-[430px] aspect-square rounded-[32px] crystal-canvas overflow-hidden" id="canvas-wrapper">
+        <!-- HERO WRITING CANVAS (Auto-fits 100dvh on any iPhone/Android aspect ratio — zero page scroll!) -->
+        <div class="flex-1 min-h-0 flex flex-col items-center justify-center w-full">
+          <div class="relative aspect-square rounded-[28px] crystal-canvas overflow-hidden" id="canvas-wrapper" style="width: min(100%, 380px, calc(100dvh - var(--prac-offset, 330px)));">
             <div class="absolute inset-0 rice-grid-apple pointer-events-none z-0"></div>
             <div id="hanzi-writer-target" class="absolute inset-0 w-full h-full flex items-center justify-center z-10"></div>
             <div id="guide-char" class="font-hanziSans absolute inset-0 flex items-center justify-center text-[220px] sm:text-[260px] font-bold select-none pointer-events-none opacity-15 transition-opacity text-slate-800 leading-none z-5">明</div>
@@ -1373,7 +1440,7 @@
             <div id="confetti-layer" class="absolute inset-0 pointer-events-none z-30 flex items-center justify-center"></div>
           </div>
 
-          <div class="grid grid-cols-4 gap-2 w-full max-w-[430px] mt-3">
+          <div class="grid grid-cols-4 gap-1.5 w-full max-w-[380px] mt-2 shrink-0">
             <button onclick="resetAndRestartWriting()" class="py-2.5 rounded-2xl glass-card text-slate-600 hover:text-slate-900 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 0 0 6.3 5.3L4 10m16 4l-2.3 4.7A8 8 0 0 1 4 15"/></svg>
               <span>Viết lại</span>
@@ -1393,15 +1460,15 @@
           </div>
         </div>
 
-        <div id="examples-drawer" class="glass-card rounded-[22px] overflow-hidden transition-all duration-300">
-          <button onclick="toggleExamplesAccordion()" class="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-bold text-slate-800 hover:bg-slate-50/50 transition">
-            <div class="flex items-center gap-2">
-              <span class="text-blue-600">Từ ghép & Câu ví dụ</span>
-              <span id="radical-story" class="text-[10px] text-slate-400 font-medium truncate max-w-[160px]"></span>
+        <div id="examples-drawer" class="glass-card rounded-[20px] overflow-hidden shrink-0">
+          <button onclick="toggleExamplesAccordion()" class="w-full px-3.5 py-2 flex items-center justify-between text-xs font-bold text-slate-800 transition">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-blue-600 shrink-0">Từ ghép & Câu ví dụ</span>
+              <span id="radical-story" class="text-[10px] text-slate-400 font-medium truncate"></span>
             </div>
-            <span id="accordion-icon" class="text-[10px] text-slate-400 font-bold">▼</span>
+            <span id="accordion-icon" class="text-[10px] text-slate-400 font-bold shrink-0 ml-1">▼</span>
           </button>
-          <div id="examples-content" class="px-3.5 pb-3 pt-0 hidden space-y-2.5 text-xs border-t border-slate-100">
+          <div id="examples-content" class="px-3.5 pb-3 pt-0 hidden space-y-2 text-xs border-t border-slate-100 max-h-[150px] overflow-y-auto ios-scroll hide-scrollbar">
             <div class="pt-2">
               <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Từ ghép hay gặp</div>
               <div id="collocations-list" class="flex flex-wrap gap-1.5"></div>
@@ -1480,7 +1547,7 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1 min-w-0 flex-1">
-                  <input id="acc-name-input" type="text" maxlength="24" onchange="saveUserProfileName(this.value)" placeholder="Nhập tên của bạn..." class="w-full bg-transparent text-[15px] font-extrabold text-black focus:outline-none focus:border-b focus:border-[#007AFF] truncate"/>
+                  <input id="acc-name-input" type="text" maxlength="24" enterkeyhint="done" autocorrect="off" spellcheck="false" onchange="saveUserProfileName(this.value)" placeholder="Nhập tên của bạn..." class="w-full bg-transparent text-[16px] font-extrabold text-black focus:outline-none focus:border-b focus:border-[#007AFF] truncate"/>
                 </div>
                 <span class="seal-stamp px-1.5 py-0.5 rounded text-[10px] font-black font-hanziKaiti tracking-widest shrink-0">江印</span>
               </div>
@@ -1686,7 +1753,7 @@
                   <span id="acc-chev-audio" class="text-[#8E8E93] font-bold text-xs transition-transform">›</span>
                 </div>
               </button>
-              <div id="acc-drawer-audio" class="hidden px-3.5 pb-3.5 pt-1 space-y-2.5 border-t border-slate-200/35">
+              <div id="acc-drawer-audio" class="hidden px-3.5 pb-3.5 pt-1.5 space-y-2.5 border-t border-slate-200/35">
                 <div class="flex items-center justify-between">
                   <span class="text-[11px] font-semibold text-[#8E8E93]">Tốc độ phát âm:</span>
                   <div class="flex gap-1">
@@ -1695,14 +1762,30 @@
                     <button onclick="changeVoiceSpeed(1)" data-s="1" class="acc-speed-btn px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-bold">Nhanh</button>
                   </div>
                 </div>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[11px] font-semibold text-[#8E8E93]">Phong cách âm:</span>
+                  <div class="flex gap-1">
+                    <button onclick="changeSoundPack('jade')" id="snd-pack-jade" class="px-2.5 py-1 rounded-lg bg-[#007AFF] text-white font-bold text-[11px]">🎋 Cổ Tranh</button>
+                    <button onclick="changeSoundPack('arcade')" id="snd-pack-arcade" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-bold text-[11px]">⚡ Sôi động</button>
+                  </div>
+                </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-semibold text-black">Âm hiệu ứng khi viết nét</span>
+                  <span class="text-[11px] font-semibold text-black">Âm thanh tương tác & Nét bút</span>
                   <button id="switch-sound" onclick="togglePrefSound()" class="ios-switch on" role="switch" aria-checked="true">
                     <div class="ios-switch-knob"></div>
                   </button>
                 </div>
                 <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-semibold text-black">Rung phản hồi khi sai nét</span>
+                  <div>
+                    <div class="text-[11px] font-semibold text-black">🎐 Nhạc nền Cổ Tranh thư giãn</div>
+                    <div class="text-[9px] text-[#8E8E93]">Giai điệu Ngũ Cung êm dịu giúp tập trung</div>
+                  </div>
+                  <button id="switch-ambient" onclick="togglePrefAmbient()" class="ios-switch" role="switch" aria-checked="false">
+                    <div class="ios-switch-knob"></div>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-semibold text-black">Rung xúc giác thông minh (Haptic)</span>
                   <button id="switch-haptic" onclick="togglePrefHaptic()" class="ios-switch on" role="switch" aria-checked="true">
                     <div class="ios-switch-knob"></div>
                   </button>
@@ -2255,14 +2338,20 @@
       return [{ id: deckId + '_1', title: 'Bài 1 • Trọng tâm', desc: 'Các chữ cốt lõi tiêu biểu', words: fallbackWords }];
     }
 
+    const _cachedDeckWords = {};
+    let _cachedAllDictWords = null;
+
     function getAllWordsForDeck(deckId) {
+      if (_cachedDeckWords[deckId]) return _cachedDeckWords[deckId];
       const map = new Map();
       getDeckLessons(deckId).forEach(ls => (ls.words || []).forEach(w => { if (!map.has(w.char)) map.set(w.char, w); }));
       (deckWordsDB[deckId] || []).forEach(w => { if (!map.has(w.char)) map.set(w.char, w); });
-      return Array.from(map.values());
+      _cachedDeckWords[deckId] = Array.from(map.values());
+      return _cachedDeckWords[deckId];
     }
 
     function getAllDictWords() {
+      if (_cachedAllDictWords) return _cachedAllDictWords;
       const map = new Map();
       if (window.JIANGZI_LESSONS) {
         Object.values(window.JIANGZI_LESSONS).forEach(lessons => {
@@ -2286,7 +2375,8 @@
           }
         });
       }
-      return Array.from(map.values());
+      _cachedAllDictWords = Array.from(map.values());
+      return _cachedAllDictWords;
     }
 
     function filterDictByRadical(rad) {
@@ -2355,7 +2445,7 @@
       const safeMeaning = (w.meaning || '').replace(/'/g, "\\'");
       const singleHanzi = (w.char.match(/[\u4e00-\u9fff]/) || [w.char])[0];
       return `
-        <div class="p-3.5 rounded-[22px] glass-card flex items-center justify-between gap-2.5">
+        <div class="perf-card p-3.5 rounded-[22px] glass-card flex items-center justify-between gap-2.5">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-900 flex items-center justify-center font-hanziSans text-xl font-black shrink-0 overflow-hidden px-1 text-center leading-tight">${w.char}</div>
             <div class="min-w-0">
@@ -2618,6 +2708,8 @@
     let userAvatarIdx = parseInt(localStorage.getItem('hm_avatar_idx') || '0', 10);
     let userAuthProvider = localStorage.getItem('hm_auth_provider') || '';
     let soundEnabled = localStorage.getItem('hm_sound') !== '0';
+    let soundPack = localStorage.getItem('hm_sound_pack') || 'jade';
+    let ambientEnabled = localStorage.getItem('hm_ambient') === '1';
     let hapticEnabled = localStorage.getItem('hm_haptic') !== '0';
     let userVoiceSpeed = parseFloat(localStorage.getItem('hm_voice_speed') || '0.85');
 
@@ -2938,6 +3030,7 @@
         userXP += 40;
         localStorage.setItem('hm_xp', String(userXP));
         setTimeout(() => {
+          playSound('unlock');
           showDynamicIsland('🏆 Hoàn thành đủ 3 Nhiệm vụ Ngày! Thưởng +40 XP ⚡', 'bg-amber-400');
         }, 600);
       }
@@ -3243,7 +3336,7 @@
 
         if (!unlocked) {
           return `
-            <div id="ls-card-${idx}" class="glass-card rounded-[24px] p-4 space-y-2.5 opacity-80">
+            <div id="ls-card-${idx}" class="perf-card glass-card rounded-[24px] p-4 space-y-2.5 opacity-80">
               <div class="flex items-start justify-between gap-2">
                 <div>
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200/80 text-[#8E8E93]">
@@ -3272,7 +3365,7 @@
         }
 
         return `
-          <div id="ls-card-${idx}" class="glass-card rounded-[24px] p-4 space-y-3 ${isFrontier ? 'ring-2 ring-[#007AFF]' : ''}">
+          <div id="ls-card-${idx}" class="perf-card glass-card rounded-[24px] p-4 space-y-3 ${isFrontier ? 'ring-2 ring-[#007AFF]' : ''}">
             <div class="flex items-start justify-between gap-2">
               <div>
                 <div class="flex items-center gap-1.5">
@@ -3312,21 +3405,27 @@
         `;
       }).join('');
 
+      playSound('sheet');
       const homeEl = document.getElementById('view-home');
       const scrimEl = document.getElementById('ios-nav-scrim');
       const sheetEl = document.getElementById('view-lessons');
       if (homeEl) homeEl.classList.add('depth-receded');
       if (scrimEl) scrimEl.classList.add('ios-scrim-open');
       if (sheetEl) {
+        sheetEl.style.transform = '';
         sheetEl.classList.remove('account-sheet-hidden');
         sheetEl.classList.add('account-sheet-open');
       }
 
       if (frontierIdx > 1) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           const cardEl = document.getElementById('ls-card-' + frontierIdx);
-          if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 180);
+          if (cardEl && listEl) {
+            listEl.scrollTop = Math.max(0, cardEl.offsetTop - 90);
+          }
+        });
+      } else if (listEl) {
+        listEl.scrollTop = 0;
       }
     }
 
@@ -3442,43 +3541,245 @@
       return activeWords[currentIndex] || activeWords[0];
     }
 
-    // Audio Synth
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(type) {
+    // =========================================================================
+    // JIANGZI DYNAMIC SOUND STUDIO & NATIVE HAPTICS ENGINE
+    // (Rising Pentatonic Guzheng • Brush Swoosh • Arcade Pop • Ambient Zen)
+    // =========================================================================
+    let _audioCtx = null;
+    let _brushNoiseBuf = null;
+    let _ambientTimer = null;
+    let _ambientMaster = null;
+    let _lastTapSoundTs = 0;
+
+    function getAudioCtx() {
+      if (!_audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) _audioCtx = new Ctx();
+      }
+      if (_audioCtx && _audioCtx.state === 'suspended') {
+        _audioCtx.resume().catch(() => {});
+      }
+      return _audioCtx;
+    }
+
+    function getBrushNoiseBuffer(ctx) {
+      if (_brushNoiseBuf) return _brushNoiseBuf;
+      const len = Math.floor(ctx.sampleRate * 0.09);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        const white = Math.random() * 2 - 1;
+        last = (last + 0.06 * white) / 1.06;
+        data[i] = last * 3.2 * (1 - i / len);
+      }
+      _brushNoiseBuf = buf;
+      return buf;
+    }
+
+    function triggerHaptic(kind = 'tick') {
+      if (!hapticEnabled) return;
+      if (window.JiangZiAndroid && typeof window.JiangZiAndroid.haptic === 'function') {
+        window.JiangZiAndroid.haptic(kind);
+        return;
+      }
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.jiangziNative) {
+        window.webkit.messageHandlers.jiangziNative.postMessage({ type: 'haptic', kind });
+        return;
+      }
+      if (navigator.vibrate) {
+        const map = { tick: 8, light: 14, success: [16, 40, 22], error: [28, 45, 32], heavy: [22, 35, 35] };
+        navigator.vibrate(map[kind] || 10);
+      }
+    }
+
+    // Chinese Pentatonic Scale (宮 商 角 徵 羽): C5 D5 E5 G5 A5 C6 D6 E6 G6 A6
+    const PENTATONIC_SCALE = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98, 1760.00];
+    // Arcade Major Scale: C5 D5 E5 F5 G5 A5 B5 C6 D6 E6
+    const ARCADE_SCALE = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66, 1318.51];
+
+    function pluckGuzhengNote(ctx, freq, startTime, duration = 0.42, peakGain = 0.22, bright = false) {
+      // Fundamental warm body
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc1.type = bright ? 'triangle' : 'sine';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(freq, startTime);
+      osc2.frequency.setValueAtTime(freq * 2, startTime);
+
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(bright ? 0.35 : 0.22, startTime);
+      g2.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.55);
+
+      g.gain.setValueAtTime(0.0001, startTime);
+      g.gain.linearRampToValueAtTime(peakGain, startTime + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0008, startTime + duration);
+
+      osc1.connect(g);
+      osc2.connect(g2);
+      g2.connect(g);
+      g.connect(ctx.destination);
+
+      osc1.start(startTime);
+      osc2.start(startTime);
+      osc1.stop(startTime + duration + 0.02);
+      osc2.stop(startTime + duration + 0.02);
+    }
+
+    function playBrushSwoosh(ctx, startTime, vol = 0.14) {
+      const src = ctx.createBufferSource();
+      src.buffer = getBrushNoiseBuffer(ctx);
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1650, startTime);
+      filter.Q.setValueAtTime(1.1, startTime);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(vol, startTime);
+      g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.075);
+      src.connect(filter);
+      filter.connect(g);
+      g.connect(ctx.destination);
+      src.start(startTime);
+    }
+
+    function playSound(type, step = 0) {
       if (!soundEnabled) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const isArcade = soundPack === 'arcade';
+
+      if (type === 'tap') {
+        if (performance.now() - _lastTapSoundTs < 45) return;
+        _lastTapSoundTs = performance.now();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(isArcade ? 680 : 590, now);
+        o.frequency.exponentialRampToValueAtTime(isArcade ? 960 : 790, now + 0.022);
+        g.gain.setValueAtTime(0.065, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(now); o.stop(now + 0.03);
+        return;
+      }
+
+      if (type === 'sheet') {
+        _lastTapSoundTs = performance.now();
+        pluckGuzhengNote(ctx, isArcade ? 587.33 : 523.25, now, 0.14, 0.08, isArcade);
+        pluckGuzhengNote(ctx, isArcade ? 880.00 : 783.99, now + 0.035, 0.16, 0.09, isArcade);
+        return;
+      }
 
       if (type === 'correct') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(1320, now + 0.12);
-        gain.gain.setValueAtTime(0.28, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-        osc.start(now); osc.stop(now + 0.18);
-      } else if (type === 'mistake') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(220, now);
-        osc.frequency.setValueAtTime(180, now + 0.1);
-        gain.gain.setValueAtTime(0.22, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-        osc.start(now); osc.stop(now + 0.22);
-      } else if (type === 'complete') {
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, now + i * 0.08);
-          g.gain.setValueAtTime(0.22, now + i * 0.08);
-          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.25);
-          o.start(now + i * 0.08); o.stop(now + i * 0.08 + 0.25);
+        _lastTapSoundTs = performance.now();
+        const scale = isArcade ? ARCADE_SCALE : PENTATONIC_SCALE;
+        const noteFreq = scale[Math.min(scale.length - 1, Math.max(0, step))];
+        if (!isArcade) playBrushSwoosh(ctx, now, 0.16);
+        pluckGuzhengNote(ctx, noteFreq, now, isArcade ? 0.24 : 0.38, 0.24, isArcade);
+        if (step >= 2) {
+          // Shimmering harmonic sparkle on Combo x3+!
+          pluckGuzhengNote(ctx, noteFreq * 1.5, now + 0.045, 0.26, 0.11, true);
+        }
+        return;
+      }
+
+      if (type === 'mistake') {
+        _lastTapSoundTs = performance.now();
+        // Warm percussive double woodblock knock (never harsh!)
+        [210, 152].forEach((f, idx) => {
+          const t = now + idx * 0.068;
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = isArcade ? 'sawtooth' : 'triangle';
+          o.frequency.setValueAtTime(f, t);
+          o.frequency.exponentialRampToValueAtTime(f * 0.68, t + 0.075);
+          g.gain.setValueAtTime(isArcade ? 0.14 : 0.22, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.085);
+          o.connect(g); g.connect(ctx.destination);
+          o.start(t); o.stop(t + 0.09);
+        });
+        return;
+      }
+
+      if (type === 'complete') {
+        _lastTapSoundTs = performance.now();
+        const notes = isArcade
+          ? [523.25, 659.25, 783.99, 1046.50, 1318.51]
+          : [523.25, 659.25, 783.99, 880.00, 1046.50];
+        notes.forEach((freq, i) => {
+          pluckGuzhengNote(ctx, freq, now + i * 0.065, 0.48, 0.20, isArcade);
+        });
+        return;
+      }
+
+      if (type === 'unlock') {
+        _lastTapSoundTs = performance.now();
+        // Grand Royal Palace / Level-Up Fanfare!
+        const fanfare = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1318.51];
+        pluckGuzhengNote(ctx, 261.63, now, 0.85, 0.18, false);
+        fanfare.forEach((freq, i) => {
+          const delay = i < 5 ? i * 0.055 : 0.28 + (i - 5) * 0.11;
+          pluckGuzhengNote(ctx, freq, now + delay, 0.62, 0.21, isArcade);
         });
       }
+    }
+
+    // Gentle Procedural Guzheng & Bamboo Windchime Zen Background Loop
+    function syncAmbientMusic() {
+      clearInterval(_ambientTimer);
+      _ambientTimer = null;
+      if (!ambientEnabled || !soundEnabled) {
+        if (_ambientMaster && _audioCtx) {
+          try { _ambientMaster.gain.setTargetAtTime(0.0001, _audioCtx.currentTime, 0.25); } catch (_) {}
+        }
+        return;
+      }
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      if (!_ambientMaster) {
+        _ambientMaster = ctx.createGain();
+        _ambientMaster.gain.setValueAtTime(0.042, ctx.currentTime);
+        _ambientMaster.connect(ctx.destination);
+      } else {
+        _ambientMaster.gain.setTargetAtTime(0.042, ctx.currentTime, 0.4);
+      }
+
+      const zenNotes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+      let stepIdx = 0;
+      const playZenPhrase = () => {
+        if (!ambientEnabled || !soundEnabled || document.hidden) return;
+        const c = getAudioCtx();
+        if (!c || c.state !== 'running') return;
+        const t = c.currentTime;
+        const n1 = zenNotes[stepIdx % zenNotes.length];
+        const n2 = zenNotes[(stepIdx + 2 + (stepIdx % 2)) % zenNotes.length];
+        stepIdx += 1 + Math.floor(Math.random() * 2);
+
+        [n1, n2].forEach((freq, k) => {
+          const o = c.createOscillator();
+          const g = c.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, t + k * 0.65);
+          g.gain.setValueAtTime(0.0001, t + k * 0.65);
+          g.gain.linearRampToValueAtTime(0.55, t + k * 0.65 + 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, t + k * 0.65 + 2.3);
+          o.connect(g);
+          g.connect(_ambientMaster);
+          o.start(t + k * 0.65);
+          o.stop(t + k * 0.65 + 2.4);
+        });
+      };
+      playZenPhrase();
+      _ambientTimer = setInterval(playZenPhrase, 2900);
+    }
+
+    function duckAmbientBriefly() {
+      if (!_ambientMaster || !_audioCtx || !ambientEnabled) return;
+      const now = _audioCtx.currentTime;
+      _ambientMaster.gain.setTargetAtTime(0.010, now, 0.08);
+      _ambientMaster.gain.setTargetAtTime(0.042, now + 1.1, 0.45);
     }
 
     function getCompoundInfo(word) {
@@ -3574,6 +3875,10 @@
 
     function renderCompoundSlots() {
       const box = document.getElementById('compound-context-box');
+      const canvasWrap = document.getElementById('canvas-wrapper');
+      if (canvasWrap) {
+        canvasWrap.style.setProperty('--prac-offset', isCompoundMode ? '415px' : '325px');
+      }
       if (!box) return;
       if (!isCompoundMode) {
         box.classList.add('hidden');
@@ -3641,11 +3946,25 @@
             drawingColor: isDark ? '#38BDF8' : (isPaper ? '#B45309' : '#007AFF'),
             drawingWidth: 20,
             showCharacter: false,
+            charDataLoader: function(ch, onComplete, onError) {
+              if (window.JIANGZI_STROKES && window.JIANGZI_STROKES[ch]) {
+                onComplete(window.JIANGZI_STROKES[ch]);
+                return;
+              }
+              fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/${encodeURIComponent(ch)}.json`)
+                .then(r => r.ok ? r.json() : Promise.reject(r.status))
+                .then(data => {
+                  if (window.JIANGZI_STROKES) window.JIANGZI_STROKES[ch] = data;
+                  onComplete(data);
+                })
+                .catch(err => { if (onError) onError(err); });
+            }
           });
 
           hanziWriterInstance.quiz({
             onCorrectStroke: function(strokeData) {
-              playSound('correct');
+              playSound('correct', strokeCombo);
+              triggerHaptic('light');
               strokeCombo++;
               totalCorrectStrokes++;
               localStorage.setItem('hm_ok_strokes', String(totalCorrectStrokes));
@@ -3675,7 +3994,7 @@
                 localStorage.setItem('hm_mistakes', JSON.stringify([...mistakeChars]));
               }
               triggerCanvasEffect('anim-shake');
-              if (hapticEnabled && navigator.vibrate) navigator.vibrate(45);
+              triggerHaptic('error');
               const total = strokeData.strokesRemaining + strokeData.strokeNum;
               const expectedName = dictRef.strokeNames && dictRef.strokeNames[strokeData.strokeNum] ? dictRef.strokeNames[strokeData.strokeNum] : 'nét tiếp theo';
               flashAlert(`Sai nét • Cần viết: ${expectedName}`);
@@ -3698,6 +4017,7 @@
               }
 
               playSound('complete');
+              triggerHaptic('success');
               if (isCompoundMode) {
                 compoundStepIdx = compoundChars.length;
                 renderCompoundSlots();
@@ -3767,6 +4087,7 @@
       const goalBanner = document.getElementById('modal-goal-banner');
 
       if (allDeckDone) {
+        setTimeout(() => { playSound('unlock'); triggerHaptic('heavy'); }, 220);
         if (!wasLearned) {
           userStreak += 1;
           localStorage.setItem('hm_streak', String(userStreak));
@@ -4001,6 +4322,7 @@
     function speakText(text, rate) {
       const actualRate = typeof rate === 'number' ? rate : userVoiceSpeed;
       triggerAudioRipple();
+      duckAmbientBriefly();
       if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.jiangziNative) {
         window.webkit.messageHandlers.jiangziNative.postMessage({ type: 'speak', text, rate: actualRate });
         return;
@@ -4449,6 +4771,7 @@
     }
 
     function openAccountSheet() {
+      playSound('sheet');
       refreshAccountUI();
       const homeEl = document.getElementById('view-home');
       const scrimEl = document.getElementById('ios-nav-scrim');
@@ -4456,6 +4779,7 @@
       if (homeEl) homeEl.classList.add('depth-receded');
       if (scrimEl) scrimEl.classList.add('ios-scrim-open');
       if (accEl) {
+        accEl.style.transform = '';
         accEl.classList.remove('account-sheet-hidden');
         accEl.classList.add('account-sheet-open');
       }
@@ -4606,8 +4930,21 @@
 
       const swSound = document.getElementById('switch-sound');
       if (swSound) swSound.classList.toggle('on', soundEnabled);
+      const swAmb = document.getElementById('switch-ambient');
+      if (swAmb) swAmb.classList.toggle('on', ambientEnabled);
       const swHaptic = document.getElementById('switch-haptic');
       if (swHaptic) swHaptic.classList.toggle('on', hapticEnabled);
+
+      const btnJade = document.getElementById('snd-pack-jade');
+      const btnArc = document.getElementById('snd-pack-arcade');
+      if (btnJade && btnArc) {
+        btnJade.className = soundPack === 'jade'
+          ? 'px-2.5 py-1 rounded-lg bg-[#007AFF] text-white font-bold text-[11px]'
+          : 'px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-bold text-[11px]';
+        btnArc.className = soundPack === 'arcade'
+          ? 'px-2.5 py-1 rounded-lg bg-[#007AFF] text-white font-bold text-[11px]'
+          : 'px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-bold text-[11px]';
+      }
     }
 
     function jumpPracticeFromAccount(ch) {
@@ -4636,18 +4973,39 @@
       speakText('你好', spd);
     }
 
+    function changeSoundPack(pack) {
+      soundPack = pack === 'arcade' ? 'arcade' : 'jade';
+      localStorage.setItem('hm_sound_pack', soundPack);
+      refreshAccountUI();
+      playSound('complete');
+      showDynamicIsland(soundPack === 'jade' ? '🎋 Âm thanh: Cổ Tranh & Chuông Ngọc' : '⚡ Âm thanh: Game Sôi Động', 'bg-[#007AFF]');
+    }
+
     function togglePrefSound() {
       soundEnabled = !soundEnabled;
       localStorage.setItem('hm_sound', soundEnabled ? '1' : '0');
       refreshAccountUI();
-      if (soundEnabled) playSound('correct');
+      syncAmbientMusic();
+      if (soundEnabled) playSound('complete');
+    }
+
+    function togglePrefAmbient() {
+      ambientEnabled = !ambientEnabled;
+      localStorage.setItem('hm_ambient', ambientEnabled ? '1' : '0');
+      if (ambientEnabled && !soundEnabled) {
+        soundEnabled = true;
+        localStorage.setItem('hm_sound', '1');
+      }
+      refreshAccountUI();
+      syncAmbientMusic();
+      showDynamicIsland(ambientEnabled ? '🎐 Đã bật Nhạc nền Cổ Tranh thư giãn' : 'Đã tắt nhạc nền thư giãn', 'bg-[#34C759]');
     }
 
     function togglePrefHaptic() {
       hapticEnabled = !hapticEnabled;
       localStorage.setItem('hm_haptic', hapticEnabled ? '1' : '0');
       refreshAccountUI();
-      if (hapticEnabled && navigator.vibrate) navigator.vibrate(35);
+      if (hapticEnabled) triggerHaptic('success');
     }
 
     function connectProvider(provider) {
@@ -4761,10 +5119,82 @@
       showDynamicIsland('Đã đặt lại tiến độ học tập về ban đầu', 'bg-amber-400');
     }
 
+    // Mobile App Tactile Touch, Virtual Keyboard Dock Hide & Swipe-Down Sheet Dismiss
+    function initMobileAppPolish() {
+      // 1. Instant 0ms tactile tap audio + haptic tick on interactive controls
+      document.addEventListener('pointerdown', (e) => {
+        const btn = e.target.closest('button, .ios-press, [onclick]');
+        if (!btn) return;
+        if (btn.id === 'paintCanvas' || btn.closest('#canvas-wrapper')) return;
+        playSound('tap');
+        triggerHaptic('tick');
+        if (ambientEnabled && (!_ambientTimer)) syncAmbientMusic();
+      }, { passive: true });
+
+      // 2. Hide floating bottom dock whenever mobile keyboard opens on an input
+      document.addEventListener('focusin', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+          document.body.classList.add('kb-open');
+        }
+      });
+      document.addEventListener('focusout', () => {
+        setTimeout(() => {
+          const active = document.activeElement;
+          if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA')) {
+            document.body.classList.remove('kb-open');
+          }
+        }, 80);
+      });
+      if (window.visualViewport) {
+        const baseH = window.innerHeight;
+        window.visualViewport.addEventListener('resize', () => {
+          const shrunk = window.visualViewport.height < baseH * 0.78;
+          document.body.classList.toggle('kb-open', shrunk);
+        });
+      }
+
+      // 3. Natural Swipe-Down on Sheet Headers (#view-lessons & #view-account) to dismiss
+      [
+        { sheetId: 'view-lessons', closeFn: closeLessonSheet },
+        { sheetId: 'view-account', closeFn: closeAccountSheet }
+      ].forEach(({ sheetId, closeFn }) => {
+        const sheet = document.getElementById(sheetId);
+        const hdr = sheet ? sheet.querySelector('header') : null;
+        if (!sheet || !hdr) return;
+        let sy = 0, dy = 0, dragging = false;
+        hdr.addEventListener('touchstart', (ev) => {
+          if (ev.touches.length !== 1) return;
+          dragging = true;
+          sy = ev.touches[0].clientY;
+          dy = 0;
+          sheet.style.transition = 'none';
+        }, { passive: true });
+        hdr.addEventListener('touchmove', (ev) => {
+          if (!dragging) return;
+          dy = Math.max(0, ev.touches[0].clientY - sy);
+          sheet.style.transform = `translate3d(0, ${dy}px, 0)`;
+        }, { passive: true });
+        const finish = () => {
+          if (!dragging) return;
+          dragging = false;
+          sheet.style.transition = '';
+          sheet.style.transform = '';
+          if (dy > 75) closeFn();
+        };
+        hdr.addEventListener('touchend', finish, { passive: true });
+        hdr.addEventListener('touchcancel', finish, { passive: true });
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && ambientEnabled) syncAmbientMusic();
+      });
+    }
+
     window.addEventListener('load', () => {
       applySavedThemeAndProfile();
       initIosEdgeSwipeBack();
       initOnboardingSwipe();
+      initMobileAppPolish();
       if (hasOnboarded) {
         showView('home');
         switchHomeTab('today');

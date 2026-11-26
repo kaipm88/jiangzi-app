@@ -107,8 +107,24 @@ final class ViewController: UIViewController, WKScriptMessageHandler, WKNavigati
             speechSynthesizer.speak(utterance)
 
         case "haptic":
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+            let kind = (body["kind"] as? String) ?? "light"
+            switch kind {
+            case "tick":
+                let sel = UISelectionFeedbackGenerator()
+                sel.selectionChanged()
+            case "success":
+                let notif = UINotificationFeedbackGenerator()
+                notif.notificationOccurred(.success)
+            case "error":
+                let notif = UINotificationFeedbackGenerator()
+                notif.notificationOccurred(.error)
+            case "heavy":
+                let imp = UIImpactFeedbackGenerator(style: .medium)
+                imp.impactOccurred()
+            default:
+                let imp = UIImpactFeedbackGenerator(style: .light)
+                imp.impactOccurred()
+            }
 
         case "kvSet":
             guard let k = body["key"] as? String, let v = body["value"] as? String else { return }

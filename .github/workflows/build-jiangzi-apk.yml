@@ -57,8 +57,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view v1.0.0 >/dev/null 2>&1; then
-            gh release upload v1.0.0 JiangZi.apk --clobber
+          if gh release view v2.0.0 >/dev/null 2>&1; then
+            gh release upload v2.0.0 JiangZi.apk --clobber
           else
-            gh release create v1.0.0 JiangZi.apk --title "JiangZi v1.0.0 (Android APK)" --notes "Bản cài đặt trực tiếp JiangZi (江字) cho điện thoại Android. Bấm vào JiangZi.apk bên dưới để tải về máy và cài đặt ngay!"
+            gh release create v2.0.0 JiangZi.apk --title "JiangZi v2.0.0 Turbo (Android 120fps + 100% Offline + Sound Studio)" --notes "Bản nâng cấp toàn diện JiangZi v2.0.0: mượt 120fps, đóng gói Offline 1.015 chữ Hán, âm thanh Cổ Tranh Ngũ Cung & nhạc nền thiền, rung Haptic gốc."
           fi
