@@ -1,0 +1,36 @@
+{
+  "name": "JiangZi • Học Tiếng Trung & Luyện Viết HSK 1–9",
+  "short_name": "JiangZi",
+  "description": "Ứng dụng học tiếng Trung toàn diện: 214 Bộ thủ, HSK 1–9, Pinyin, Viết Mù chủ động & Từ điển Hán–Việt bởi Đông Giang.",
+  "lang": "vi",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAF0F8",
+  "theme_color": "#EAF0F8",
+  "icons": [
+    {
+      "src": "icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

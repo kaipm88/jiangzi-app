@@ -1,0 +1,62 @@
+name: Build JiangZi Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'hanzi_web/**'
+      - 'android_jiangzi/**'
+      - '.github/workflows/build-jiangzi-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Sync latest hanzi_web into Android assets
+        run: |
+          rm -rf android_jiangzi/app/src/main/assets/www
+          mkdir -p android_jiangzi/app/src/main/assets/www
+          cp -R hanzi_web/* android_jiangzi/app/src/main/assets/www/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build Ready-to-Install Release APK
+        working-directory: android_jiangzi
+        run: |
+          gradle assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk ../JiangZi.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JiangZi-Android-APK
+          path: JiangZi.apk
+
+      - name: Publish Direct Download Release APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release upload v1.0.0 JiangZi.apk --clobber
+          else
+            gh release create v1.0.0 JiangZi.apk --title "JiangZi v1.0.0 (Android APK)" --notes "Bản cài đặt trực tiếp JiangZi (江字) cho điện thoại Android. Bấm vào JiangZi.apk bên dưới để tải về máy và cài đặt ngay!"
+          fi
