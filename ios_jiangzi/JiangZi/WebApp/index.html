@@ -28,6 +28,7 @@
   <script src="data/bank_radicals.js"></script>
   <script src="data/bank_hsk1.js"></script>
   <script src="data/bank_hsk2_9.js"></script>
+  <script src="data/char_meta.js"></script>
   <script src="lessons_data.js"></script>
   <script src="data/strokes_offline.js" defer></script>
   <style>
@@ -393,6 +394,23 @@
     }
     #app-wrapper[data-theme="dark"] #onboard-bamboo-bg {
       opacity: 0.10 !important;
+    }
+    #app-wrapper[data-theme="dark"] #success-modal-card {
+      background: #151F32 !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      color: #F1F5F9 !important;
+    }
+    #app-wrapper[data-theme="dark"] .story-inline-pill {
+      background: rgba(245, 158, 11, 0.14) !important;
+      border-color: rgba(245, 158, 11, 0.28) !important;
+      color: #FDE68A !important;
+    }
+    #app-wrapper[data-theme="paper"] #success-modal-card {
+      background: #FCF9F1 !important;
+      border-color: #E2D6BA !important;
+    }
+    .word-card-slide {
+      transition: transform 0.2s var(--ios-ease), opacity 0.18s ease;
     }
     .ios-scroll {
       -webkit-overflow-scrolling: touch;
@@ -1064,11 +1082,11 @@
         </div>
         <div class="flex items-center gap-1.5">
           <div id="home-xp-pill" class="flex items-center gap-1 px-2.5 py-1 rounded-full glass-card text-[#007AFF] font-bold text-xs transition-transform">
-            <span>⚡</span><span id="home-xp">120</span>
+            <span>⚡</span><span id="home-xp">0</span>
           </div>
           <div id="home-streak-pill" class="flex items-center gap-1 px-2.5 py-1 rounded-full glass-card text-[#FF9500] font-bold text-xs transition-transform">
             <svg class="w-3.5 h-3.5 text-[#FF9500]" viewBox="0 0 24 24" fill="currentColor"><path d="M12.7 2.3a1 1 0 0 0-1.4 0C8.2 5.4 5 9.2 5 13.5a7 7 0 0 0 14 0c0-3.3-1.8-6.4-4-8.8-.3-.3-.8-.3-1.1 0-.4.4-.8 1.1-1.1 1.8-.4-1.5-.3-3-.1-4.2z"/></svg>
-            <span id="home-streak">14</span>
+            <span id="home-streak">0</span>
           </div>
           <button onclick="openAccountSheet()" id="header-avatar-btn" class="ios-press relative w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-base shadow-[0_4px_12px_rgba(16,185,129,0.28)] border-2 border-white/90" title="Hồ sơ, Giao diện & Cài đặt">
             <span id="header-avatar-icon">🎋</span>
@@ -1082,34 +1100,44 @@
       <!-- ============================================ -->
       <div id="tab-content-today" class="flex-1 overflow-y-auto ios-scroll hide-scrollbar px-4 pt-3 pb-24 space-y-3.5">
         
-        <!-- Hero Circular Progress Ring Card -->
-        <div class="p-4 rounded-[22px] glass-card flex items-center justify-between gap-3">
-          <div class="space-y-1.5 flex-1">
-            <span id="hero-hsk-pill" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#007AFF]/10 text-[#007AFF]">
-              HSK 1 • Mục tiêu ngày
-            </span>
-            <div id="hero-status-msg" class="text-[15px] font-bold tracking-[-0.015em] text-black leading-snug">
-              Sẵn sàng luyện viết hôm nay!
+        <!-- HERO CALLIGRAPHY FOCUS CARD -->
+        <div class="p-4 rounded-[24px] glass-card relative overflow-hidden">
+          <div id="hero-watermark-char" class="font-hanziKaiti absolute -right-2 -bottom-5 text-[96px] font-black text-[#007AFF]/[0.07] leading-none pointer-events-none select-none">你</div>
+          <div class="relative z-10 flex items-center justify-between gap-3">
+            <div class="space-y-1 min-w-0 flex-1">
+              <span id="hero-hsk-pill" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#007AFF]/12 text-[#007AFF]">
+                🔓 HSK 1 • Bài 1
+              </span>
+              <div id="hero-status-msg" class="text-[15px] font-extrabold tracking-[-0.015em] text-black leading-snug truncate">
+                Chữ tiếp theo: 你 (nǐ)
+              </div>
+              <div id="hero-next-sub" class="text-xs text-[#8E8E93] font-medium truncate">
+                Hán Việt: <b class="text-slate-700">NHĨ</b> • Bạn, anh, chị
+              </div>
             </div>
-            <div class="flex items-center gap-2 pt-0.5">
-              <button onclick="startNextUnfinishedLesson()" class="ios-press px-4 py-2 rounded-full btn-primary-glass text-white text-xs font-semibold inline-flex items-center gap-1.5">
-                <span id="hero-cta-label">Học bài tiếp theo</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-              </button>
-              <button onclick="openLessonSheet(userActiveDeck)" class="ios-press px-3 py-2 rounded-full bg-[#007AFF]/10 text-[#007AFF] text-xs font-bold">
-                Chọn bài
-              </button>
+
+            <!-- Next Character & Progress Ring Badge -->
+            <div class="relative w-[74px] h-[74px] shrink-0 flex items-center justify-center">
+              <svg class="w-[74px] h-[74px] -rotate-90" viewBox="0 0 84 84">
+                <circle cx="42" cy="42" r="35" fill="none" stroke="rgba(120,120,128,0.12)" stroke-width="6.5"/>
+                <circle id="hero-ring-circle" cx="42" cy="42" r="35" fill="none" stroke="#007AFF" stroke-width="6.5" stroke-linecap="round" stroke-dasharray="219.9" stroke-dashoffset="195" class="transition-all duration-700"/>
+              </svg>
+              <div class="absolute text-center">
+                <div id="hero-next-char" class="font-hanziSans text-xl font-black text-[#007AFF] leading-none">你</div>
+                <div id="hero-ring-count" class="text-[9px] font-extrabold text-[#8E8E93] mt-0.5">0/300</div>
+              </div>
             </div>
           </div>
-          <div class="relative w-[82px] h-[82px] shrink-0 flex items-center justify-center">
-            <svg class="w-[82px] h-[82px] -rotate-90" viewBox="0 0 84 84">
-              <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(120,120,128,0.12)" stroke-width="7.5"/>
-              <circle id="hero-ring-circle" cx="42" cy="42" r="34" fill="none" stroke="#007AFF" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="190" class="transition-all duration-700"/>
-            </svg>
-            <div class="absolute text-center">
-              <div id="hero-ring-count" class="text-sm font-extrabold text-black">0/6</div>
-              <div class="text-[8px] font-bold text-[#8E8E93] uppercase tracking-wider">ĐÃ THUỘC</div>
-            </div>
+
+          <div class="relative z-10 flex items-center gap-2 mt-3">
+            <button onclick="startNextUnfinishedLesson()" class="ios-press flex-1 py-2.5 px-4 rounded-2xl btn-primary-glass text-white text-xs font-bold inline-flex items-center justify-center gap-1.5">
+              <span>✍️</span>
+              <span id="hero-cta-label">Đặt bút học tiếp</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+            <button onclick="openLessonSheet(userActiveDeck)" class="ios-press py-2.5 px-3.5 rounded-2xl bg-[#007AFF]/12 text-[#007AFF] text-xs font-extrabold shrink-0">
+              Chọn bài
+            </button>
           </div>
         </div>
 
@@ -1173,28 +1201,10 @@
           </div>
         </div>
 
-        <!-- Quick Shortcuts: Pinyin & Dictionary -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div onclick="switchHomeTab('pinyin')" class="cursor-pointer p-3.5 rounded-[22px] glass-card transition active:scale-[0.97]">
-            <div class="w-8 h-8 rounded-xl bg-sky-500/12 text-sky-600 flex items-center justify-center mb-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/></svg>
-            </div>
-            <div class="text-xs font-extrabold text-slate-900">Bảng Phát Âm</div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Phụ âm, nguyên âm & 4 thanh</div>
-          </div>
-          <div onclick="switchHomeTab('dict')" class="cursor-pointer p-3.5 rounded-[22px] glass-card transition active:scale-[0.97]">
-            <div class="w-8 h-8 rounded-xl bg-indigo-500/12 text-indigo-600 flex items-center justify-center mb-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5"/></svg>
-            </div>
-            <div class="text-xs font-extrabold text-slate-900">Tra Từ Điển</div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Tra Hán, Pinyin, nghĩa Việt</div>
-          </div>
-        </div>
-
         <!-- Active HSK Card -->
         <div class="space-y-2">
           <div class="flex items-center justify-between px-1">
-            <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Cấp độ đang học</h2>
+            <h2 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Lộ trình cấp độ đang mở</h2>
             <button onclick="switchHomeTab('library')" class="text-xs font-bold text-blue-600 hover:underline">Kho HSK 1–9 →</button>
           </div>
           <div id="active-hsk-card" class="p-4 rounded-[24px] glass-card"></div>
@@ -1322,20 +1332,24 @@
       <div class="ios-safe-dock absolute bottom-3 inset-x-4 z-30">
         <nav class="relative glass-nav rounded-[30px] p-[4px] grid grid-cols-4">
           <div id="nav-pill" class="spring-slide glass-pill-active absolute top-[4px] bottom-[4px] left-[4px] w-[calc((100%_-_8px)/4)] rounded-[26px] pointer-events-none"></div>
-          <button onclick="switchHomeTab('today')" id="nav-today" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#007AFF] font-semibold text-[10px] tracking-[-0.01em] transition-colors">
-            <svg class="w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6.5h-5V21H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+          <button onclick="switchHomeTab('today')" id="nav-today" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#007AFF] font-extrabold text-[10px] tracking-[-0.01em] transition-colors">
+            <svg class="icon-filled w-[21px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"/><path d="M12 5.432l8.159 8.159v6.159a2.25 2.25 0 01-2.25 2.25h-11.82a2.25 2.25 0 01-2.25-2.25v-6.159L12 5.432z"/></svg>
+            <svg class="icon-outline hidden w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6.5h-5V21H4a1 1 0 0 1-1-1v-9.5z"/></svg>
             <span>Hôm nay</span>
           </button>
           <button onclick="switchHomeTab('pinyin')" id="nav-pinyin" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#8E8E93] font-medium text-[10px] tracking-[-0.01em] transition-colors">
-            <svg class="w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/></svg>
+            <svg class="icon-filled hidden w-[21px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z"/></svg>
+            <svg class="icon-outline w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/></svg>
             <span>Phát âm</span>
           </button>
           <button onclick="switchHomeTab('library')" id="nav-library" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#8E8E93] font-medium text-[10px] tracking-[-0.01em] transition-colors">
-            <svg class="w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5V5a2 2 0 0 1 2-2h14v14H6.5a2.5 2.5 0 0 0-2.5 2.5z"/></svg>
+            <svg class="icon-filled hidden w-[21px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.533A9.707 9.707 0 006 3a9.735 9.735 0 00-3.25.555.75.75 0 00-.5.707v14.25a.75.75 0 001 .707A8.237 8.237 0 016 18.75c1.995 0 3.823.707 5.25 1.886V4.533zM12.75 20.636A8.214 8.214 0 0118 18.75c.966 0 1.89.166 2.75.47a.75.75 0 001-.708V4.262a.75.75 0 00-.5-.707A9.735 9.735 0 0018 3a9.707 9.707 0 00-5.25 1.533v16.103z"/></svg>
+            <svg class="icon-outline w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5V5a2 2 0 0 1 2-2h14v14H6.5a2.5 2.5 0 0 0-2.5 2.5z"/></svg>
             <span>Kho HSK</span>
           </button>
           <button onclick="switchHomeTab('dict')" id="nav-dict" class="relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#8E8E93] font-medium text-[10px] tracking-[-0.01em] transition-colors">
-            <svg class="w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5"/></svg>
+            <svg class="icon-filled hidden w-[21px] h-[21px]" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd"/></svg>
+            <svg class="icon-outline w-[21px] h-[21px]" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 20l-3.5-3.5"/></svg>
             <span>Từ điển</span>
           </button>
         </nav>
@@ -1383,19 +1397,21 @@
 
       <main class="ios-safe-practice-bottom flex-1 min-h-0 px-4 pb-3 flex flex-col justify-between gap-2 overflow-hidden">
         
-        <div id="word-card" class="glass-card rounded-[22px] p-3 space-y-2">
-          <div class="flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span id="word-pinyin" class="text-2xl font-black tracking-tight text-[#007AFF]">míng</span>
+        <div id="word-card" class="word-card-slide glass-card rounded-[22px] p-2.5 space-y-1.5 shrink-0">
+          <div class="flex items-center justify-between gap-1.5">
+            <button onclick="prevWordWithSlide()" class="ios-press w-7 h-7 rounded-full bg-slate-100 text-[#007AFF] font-black text-base flex items-center justify-center shrink-0" title="Chữ trước (hoặc vuốt phải)">‹</button>
+
+            <div class="min-w-0 flex-1 px-1">
+              <div class="flex items-center gap-1.5">
+                <span id="word-pinyin" class="text-xl sm:text-2xl font-black tracking-tight text-[#007AFF] leading-none">míng</span>
                 <div class="flex items-center gap-1">
                   <div class="relative flex items-center justify-center">
                     <span id="practice-audio-ripple" class="hidden absolute inset-0 rounded-full bg-[#007AFF]/40 ripple-ring pointer-events-none"></span>
-                    <button onclick="speakCurrentPracticeTarget(0.9)" class="relative z-10 w-7 h-7 rounded-full bg-[#007AFF]/10 text-[#007AFF] flex items-center justify-center transition active:scale-90" title="Phát âm chuẩn">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/></svg>
+                    <button onclick="speakCurrentPracticeTarget(0.9)" class="relative z-10 w-6 h-6 rounded-full bg-[#007AFF]/12 text-[#007AFF] flex items-center justify-center transition active:scale-90" title="Phát âm chuẩn">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7m2.8-9.8a9 9 0 0 1 0 12.6"/></svg>
                     </button>
                   </div>
-                  <button onclick="speakCurrentPracticeTarget(0.55)" class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold transition active:scale-90" title="Đọc chậm 0.6x">
+                  <button onclick="speakCurrentPracticeTarget(0.55)" class="px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold transition active:scale-90" title="Đọc chậm 0.6x">
                     0.6x
                   </button>
                 </div>
@@ -1405,15 +1421,21 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-1.5 shrink-0">
-              <button onclick="toggleCompoundMode()" id="btn-compound-mode" class="ios-press px-2.5 py-1.5 rounded-2xl text-[11px] font-bold flex items-center gap-1 bg-emerald-500/12 text-emerald-700">
-                <span>🧩</span><span id="compound-mode-label">Từ ghép</span>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="toggleCompoundMode()" id="btn-compound-mode" class="ios-press px-2 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 bg-emerald-500/12 text-emerald-700">
+                <span>🧩</span><span id="compound-mode-label">Ghép</span>
               </button>
-              <button onclick="toggleBlindMode()" id="btn-blind" class="px-2.5 py-1.5 rounded-2xl text-[11px] font-bold flex items-center gap-1 bg-blue-500/10 text-blue-600 transition active:scale-95">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10.4 10.4 0 0 1 12 5c5 0 9.3 3.1 11 7-1 2.3-2.8 4.2-5 5.4M6.6 6.6C4.6 7.9 3 9.8 2 12c1.7 3.9 6 7 10 7 1.3 0 2.5-.2 3.7-.7"/></svg>
-                <span id="blind-text">Viết mù</span>
+              <button onclick="cycleWriteStudyMode()" id="btn-blind" class="ios-press px-2 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 btn-primary-glass text-white shrink-0">
+                <span id="blind-text">🎯 2 Bước</span>
               </button>
+              <button onclick="nextWordWithSlide()" class="ios-press w-7 h-7 rounded-full bg-[#007AFF]/12 text-[#007AFF] font-black text-base flex items-center justify-center shrink-0" title="Chữ tiếp theo (hoặc vuốt trái)">›</button>
             </div>
+          </div>
+
+          <!-- INLINE MNEMONIC / RADICAL STORY PILL (Visible immediately!) -->
+          <div id="word-story-inline-box" class="story-inline-pill px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-[11px] text-amber-950 leading-snug flex items-start gap-1.5">
+            <span class="shrink-0">💡</span>
+            <span id="word-story-inline" class="line-clamp-2 font-medium">Mặt trời (日) + Mặt trăng (月) = Ánh sáng rực rỡ</span>
           </div>
 
           <!-- TIER 2: 2-CHAR COMPOUND & SENTENCE FILL-IN PUZZLE BAR -->
@@ -1886,65 +1908,65 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- APPLE GLASS SUCCESS CELEBRATION MODAL -->
-  <div id="success-modal" class="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div id="success-modal-card" class="bg-white/95 backdrop-blur-2xl rounded-[32px] p-6 max-w-sm w-full shadow-[0_24px_60px_rgba(15,23,42,0.22)] border border-white text-center anim-spring">
-      <div id="modal-top-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/12 text-emerald-700 text-xs font-extrabold mb-3">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-        <span id="modal-badge-text">VIẾT CHÍNH XÁC 100% • +10 XP</span>
-      </div>
-      <div id="modal-goal-banner" class="hidden mb-3 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-300/60 text-amber-800 text-xs font-extrabold">
-        🏆 HOÀN THÀNH MỤC TIÊU BÀI HỌC! Streak +1 🔥
-      </div>
-      <button id="modal-next-lesson-btn" onclick="jumpToNextUnlockedLesson()" class="hidden w-full mb-3 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-extrabold shadow-md ios-press">
-        🔓 Đã mở khóa bài tiếp theo! Bấm học ngay →
-      </button>
-
-      <div class="py-4 bg-slate-50/90 rounded-[24px] border border-slate-100 mb-3">
-        <div id="modal-char-display" class="font-hanziSans text-6xl font-black text-slate-900 mb-1.5 leading-none">明</div>
-        <div class="flex items-center justify-center gap-2">
-          <span id="modal-pinyin-display" class="text-xl font-extrabold text-blue-600 tracking-wide">míng</span>
-          <button onclick="speakCurrentPracticeTarget(0.85)" class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 text-xs font-bold flex items-center gap-1 hover:bg-blue-500/20 transition active:scale-95">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7"/></svg>
-            <span>Nghe lại</span>
-          </button>
+    <!-- APPLE GLASS SUCCESS CELEBRATION MODAL (Inside #app-wrapper for full Dark/Paper Theme sync!) -->
+    <div id="success-modal" class="absolute inset-0 z-50 bg-slate-900/55 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div id="success-modal-card" class="bg-white/95 backdrop-blur-2xl rounded-[32px] p-6 max-w-sm w-full shadow-[0_24px_60px_rgba(15,23,42,0.22)] border border-white text-center anim-spring">
+        <div id="modal-top-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/12 text-emerald-700 text-xs font-extrabold mb-3">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <span id="modal-badge-text">VIẾT CHÍNH XÁC 100% • +15 XP</span>
         </div>
-      </div>
-
-      <div class="bg-blue-50/60 rounded-[20px] p-3.5 border border-blue-100/80 mb-4 text-left space-y-1.5 text-xs">
-        <div>
-          <span class="text-slate-500 font-medium">Hán Việt:</span>
-          <b id="modal-hanviet-display" class="text-slate-900 text-sm ml-1 font-extrabold">MINH</b>
+        <div id="modal-goal-banner" class="hidden mb-3 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-300/60 text-amber-700 text-xs font-extrabold">
+          🏆 HOÀN THÀNH MỤC TIÊU BÀI HỌC! Streak +1 🔥
         </div>
-        <div>
-          <span class="text-slate-500 font-medium">Nghĩa:</span>
-          <b id="modal-meaning-display" class="text-blue-700 text-sm ml-1 font-bold">Sáng sủa, thông minh</b>
-        </div>
-        <div class="pt-1.5 border-t border-blue-200/50 text-[11px] text-slate-600 italic">
-          <span id="modal-story-display">Mặt trời + Mặt trăng = Ánh sáng rực rỡ</span>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Hẹn ngày ôn lại thông minh (SRS):</div>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="closeSuccessModalWithSrs('hard')" class="ios-press py-2.5 rounded-2xl bg-amber-500/12 text-amber-700 font-bold text-xs">
-            Khó • 1 ngày
-          </button>
-          <button onclick="closeSuccessModalWithSrs('good')" class="ios-press py-2.5 rounded-2xl btn-primary-glass text-white font-extrabold text-xs">
-            Nhớ tốt • 4n →
-          </button>
-          <button onclick="closeSuccessModalWithSrs('easy')" class="ios-press py-2.5 rounded-2xl bg-emerald-500/14 text-emerald-700 font-bold text-xs">
-            Dễ • 10 ngày ⚡
-          </button>
-        </div>
-        <button onclick="replayCurrentWord()" class="w-full py-2 text-slate-500 hover:text-slate-800 font-semibold text-[11px] transition">
-          ↺ Viết lại chữ này thêm lần nữa
+        <button id="modal-next-lesson-btn" onclick="jumpToNextUnlockedLesson()" class="hidden w-full mb-3 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-extrabold shadow-md ios-press">
+          🔓 Đã mở khóa bài tiếp theo! Bấm học ngay →
         </button>
+
+        <div class="py-4 bg-slate-50/90 rounded-[24px] border border-slate-100 mb-3">
+          <div id="modal-char-display" class="font-hanziSans text-6xl font-black text-slate-900 mb-1.5 leading-none">明</div>
+          <div class="flex items-center justify-center gap-2">
+            <span id="modal-pinyin-display" class="text-xl font-extrabold text-[#007AFF] tracking-wide">míng</span>
+            <button onclick="speakCurrentPracticeTarget(0.85)" class="px-2.5 py-1 rounded-full bg-blue-500/10 text-[#007AFF] text-xs font-bold flex items-center gap-1 hover:bg-blue-500/20 transition active:scale-95">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H3v6h3l5 4V5zm4.5 3.5a5 5 0 0 1 0 7"/></svg>
+              <span>Nghe lại</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-blue-50/80 rounded-[20px] p-3.5 border border-blue-100/80 mb-4 text-left space-y-1.5 text-xs">
+          <div>
+            <span class="text-slate-500 font-medium">Hán Việt:</span>
+            <b id="modal-hanviet-display" class="text-slate-900 text-sm ml-1 font-extrabold">MINH</b>
+          </div>
+          <div>
+            <span class="text-slate-500 font-medium">Nghĩa:</span>
+            <b id="modal-meaning-display" class="text-[#007AFF] text-sm ml-1 font-bold">Sáng sủa, thông minh</b>
+          </div>
+          <div class="pt-1.5 border-t border-blue-200/40 text-[11px] text-slate-600 italic">
+            <span id="modal-story-display">Mặt trời + Mặt trăng = Ánh sáng rực rỡ</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Hẹn ngày ôn lại thông minh (SRS):</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="closeSuccessModalWithSrs('hard')" class="ios-press py-2.5 rounded-2xl bg-amber-500/12 text-amber-600 font-bold text-xs">
+              Khó • 1 ngày
+            </button>
+            <button onclick="closeSuccessModalWithSrs('good')" class="ios-press py-2.5 rounded-2xl btn-primary-glass text-white font-extrabold text-xs">
+              Nhớ tốt • 4n →
+            </button>
+            <button onclick="closeSuccessModalWithSrs('easy')" class="ios-press py-2.5 rounded-2xl bg-emerald-500/14 text-emerald-600 font-bold text-xs">
+              Dễ • 10 ngày ⚡
+            </button>
+          </div>
+          <button onclick="replayCurrentWord()" class="w-full py-2 text-slate-500 hover:text-slate-800 font-semibold text-[11px] transition">
+            ↺ Viết lại chữ này thêm lần nữa
+          </button>
+        </div>
       </div>
     </div>
+
   </div>
 
   <!-- APP LOGIC, PINYIN ENGINE, DICTIONARY & HSK DATASETS -->
@@ -2693,24 +2715,99 @@
     }
 
     // =========================================================
-    // 3. APP STATE & ROUTING
+    // 3. APP STATE, 100% HONEST STATS & REAL CALENDAR STREAK
     // =========================================================
+    function getLocalDateKey(offsetDays = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function getIsoWeekKey() {
+      const d = new Date();
+      const dayIdx = (d.getDay() + 6) % 7; // Mon=0 .. Sun=6
+      const mon = new Date(d);
+      mon.setDate(d.getDate() - dayIdx);
+      return `${mon.getFullYear()}-${String(mon.getMonth() + 1).padStart(2, '0')}-${String(mon.getDate()).padStart(2, '0')}`;
+    }
+
     let userActiveDeck = localStorage.getItem('hm_deck') || 'hsk1';
     let userDailyGoal = parseInt(localStorage.getItem('hm_goal') || '8', 10);
-    let userXP = parseInt(localStorage.getItem('hm_xp') || '120', 10);
-    let userStreak = parseInt(localStorage.getItem('hm_streak') || '14', 10);
-    let bestStreak = parseInt(localStorage.getItem('hm_best_streak') || String(userStreak), 10);
     let hasOnboarded = localStorage.getItem('hm_onboarded_v2') === '1';
     let learnedChars = new Set(JSON.parse(localStorage.getItem('hm_learned') || '[]'));
     let mistakeChars = new Set(JSON.parse(localStorage.getItem('hm_mistakes') || '[]'));
-    let totalCorrectStrokes = parseInt(localStorage.getItem('hm_ok_strokes') || '48', 10);
-    let totalMistakeStrokes = parseInt(localStorage.getItem('hm_err_strokes') || '2', 10);
-    let weeklyActiveDays = new Set(JSON.parse(localStorage.getItem('hm_week_days') || '[0,1,2]'));
+
+    // One-time honest migration: clear old demo defaults (120 XP, 14 Streak, [0,1,2]) if user hasn't learned chars yet
+    if (localStorage.getItem('hm_honest_v22') !== '1') {
+      if (learnedChars.size === 0) {
+        localStorage.setItem('hm_xp', '0');
+        localStorage.setItem('hm_streak', '0');
+        localStorage.setItem('hm_best_streak', '0');
+        localStorage.setItem('hm_ok_strokes', '0');
+        localStorage.setItem('hm_err_strokes', '0');
+        localStorage.setItem('hm_week_days', '[]');
+        localStorage.removeItem('hm_last_study_date');
+      } else if (!localStorage.getItem('hm_last_study_date')) {
+        localStorage.setItem('hm_last_study_date', getLocalDateKey(0));
+        localStorage.setItem('hm_streak', '1');
+        localStorage.setItem('hm_best_streak', '1');
+        localStorage.setItem('hm_week_days', JSON.stringify([(new Date().getDay() + 6) % 7]));
+      }
+      localStorage.setItem('hm_honest_v22', '1');
+    }
+
+    const todayDateKey = getLocalDateKey(0);
+    const yesterdayDateKey = getLocalDateKey(-1);
+    const currentWeekKey = getIsoWeekKey();
+    if (localStorage.getItem('hm_week_key') !== currentWeekKey) {
+      localStorage.setItem('hm_week_key', currentWeekKey);
+      localStorage.setItem('hm_week_days', '[]');
+    }
+
+    let userXP = parseInt(localStorage.getItem('hm_xp') || '0', 10);
+    let userStreak = parseInt(localStorage.getItem('hm_streak') || '0', 10);
+    let bestStreak = parseInt(localStorage.getItem('hm_best_streak') || '0', 10);
+    let lastStudyDate = localStorage.getItem('hm_last_study_date') || '';
+    // If user missed >= 2 full days, streak resets honestly to 0 until today's study!
+    if (lastStudyDate && lastStudyDate !== todayDateKey && lastStudyDate !== yesterdayDateKey) {
+      userStreak = 0;
+      localStorage.setItem('hm_streak', '0');
+    }
+
+    let totalCorrectStrokes = parseInt(localStorage.getItem('hm_ok_strokes') || '0', 10);
+    let totalMistakeStrokes = parseInt(localStorage.getItem('hm_err_strokes') || '0', 10);
+    let weeklyActiveDays = new Set(JSON.parse(localStorage.getItem('hm_week_days') || '[]'));
+
+    function recordDailyStreakOnStudy() {
+      const todayIdx = (new Date().getDay() + 6) % 7;
+      weeklyActiveDays.add(todayIdx);
+      localStorage.setItem('hm_week_days', JSON.stringify([...weeklyActiveDays]));
+      localStorage.setItem('hm_week_key', currentWeekKey);
+
+      if (lastStudyDate === todayDateKey) return false;
+      if (lastStudyDate === yesterdayDateKey) {
+        userStreak += 1;
+      } else {
+        userStreak = 1;
+      }
+      lastStudyDate = todayDateKey;
+      localStorage.setItem('hm_last_study_date', todayDateKey);
+      localStorage.setItem('hm_streak', String(userStreak));
+      if (userStreak > bestStreak) {
+        bestStreak = userStreak;
+        localStorage.setItem('hm_best_streak', String(bestStreak));
+      }
+      return true;
+    }
 
     // Real SRS Memory Map & Daily Quests State
     let srsDB = JSON.parse(localStorage.getItem('hm_srs_db') || '{}');
-    const todayDateKey = new Date().toISOString().slice(0, 10);
     let dailyQuests = JSON.parse(localStorage.getItem('hm_quests_' + todayDateKey) || '{"charsWritten":0,"compoundDone":false,"pinyinQuizDone":false,"bonusClaimed":false}');
+    let studyMode = localStorage.getItem('hm_study_mode') || 'twostep'; // 'twostep' | 'guided' | 'blind'
+    let twoStepPhase = 0; // 0 = Passo 1 (guided trace), 1 = Passo 2 (blind memory lock)
 
     // Practice Compound / Context & Progressive Lesson Unlock State
     let unlockedLessons = new Set(JSON.parse(localStorage.getItem('hm_unlocked_lessons') || '[]'));
@@ -3031,9 +3128,16 @@
           tabEl.classList.add('anim-tab-enter');
         }
         const navBtn = document.getElementById('nav-' + t);
-        navBtn.className = t === tabName
-          ? 'relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#007AFF] font-semibold text-[10px] tracking-[-0.01em] transition-colors'
+        const active = t === tabName;
+        navBtn.className = active
+          ? 'relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#007AFF] font-extrabold text-[10px] tracking-[-0.01em] transition-colors'
           : 'relative z-10 py-1.5 flex flex-col items-center gap-0.5 text-[#8E8E93] font-medium text-[10px] tracking-[-0.01em] transition-colors';
+        const fSvg = navBtn.querySelector('.icon-filled');
+        const oSvg = navBtn.querySelector('.icon-outline');
+        if (fSvg && oSvg) {
+          fSvg.classList.toggle('hidden', !active);
+          oSvg.classList.toggle('hidden', active);
+        }
       });
       document.getElementById('home-title').innerText = titles[tabName];
 
@@ -3158,24 +3262,32 @@
 
       const nextLessonIdx = getCurrentFrontierLessonIdx(userActiveDeck);
       const curLesson = lessons[nextLessonIdx] || lessons[0];
+      const nextWordObj = curLesson.words.find(w => !learnedChars.has(w.char)) || curLesson.words[0];
 
       document.getElementById('home-xp').innerText = userXP;
       document.getElementById('home-streak').innerText = userStreak;
-      document.getElementById('home-subtitle').innerText = `Mục tiêu: ${userDailyGoal} từ / ngày`;
-      document.getElementById('hero-hsk-pill').innerText = `${meta.name} • ${lessons.length} bài chủ đề`;
+      document.getElementById('home-subtitle').innerText = `${meta.name} • Mở ${lessons.filter((_, i) => isLessonUnlocked(userActiveDeck, i)).length}/${lessons.length} bài`;
+      document.getElementById('hero-hsk-pill').innerText = `🔓 ${curLesson.title}`;
       document.getElementById('step2-title').innerText = `2. ${curLesson.title}`;
       document.getElementById('step2-desc').innerText = `${curLesson.desc}`;
       const ctaLbl = document.getElementById('hero-cta-label');
-      if (ctaLbl) ctaLbl.innerText = `Học ${curLesson.title.split('•')[0].trim()}`;
+      if (ctaLbl) ctaLbl.innerText = `Đặt bút học ${curLesson.title.split('•')[0].trim()}`;
 
-      const circ = 213.6;
-      const offset = circ * (1 - Math.max(0.06, ratio));
+      const circ = 219.9;
+      const offset = circ * (1 - Math.max(0.05, ratio));
       document.getElementById('hero-ring-circle').setAttribute('stroke-dashoffset', offset.toFixed(1));
       document.getElementById('hero-ring-count').innerText = `${doneCount}/${deckList.length}`;
+      const wmEl = document.getElementById('hero-watermark-char');
+      const ncEl = document.getElementById('hero-next-char');
+      const nsEl = document.getElementById('hero-next-sub');
+      if (wmEl && nextWordObj) wmEl.innerText = nextWordObj.char;
+      if (ncEl && nextWordObj) ncEl.innerText = nextWordObj.char;
+      if (nsEl && nextWordObj) nsEl.innerHTML = `Hán Việt: <b class="text-slate-700">${nextWordObj.hanviet}</b> • ${nextWordObj.meaning}`;
+
       const remain = Math.max(0, deckList.length - doneCount);
       document.getElementById('hero-status-msg').innerText = remain === 0
-        ? `Xuất sắc! Bạn đã thuộc trọn bộ ${meta.name}!`
-        : `Đang học: ${curLesson.title}`;
+        ? `Xuất sắc! Đã thuộc trọn bộ ${meta.name}!`
+        : `Chữ tiếp theo: ${nextWordObj.char} (${nextWordObj.pinyin})`;
 
       // Real SRS Due Status & Tomorrow Hook
       const { dueNow, dueSoonCount } = getSrsStats();
@@ -3944,7 +4056,16 @@
       const word = getCurrentWord();
       const targetChar = getActiveDrawChar();
       const dictRef = getAllDictWords().find(x => x.char === targetChar) || word;
-      updateStrokeStatus(0, dictRef.strokeCount || 6, isCompoundMode ? `Chữ ${compoundStepIdx + 1}/${compoundChars.length}...` : 'Nét 1...', 'normal');
+
+      // Determine whether outline is shown on this pass (2-Step Smart Memory Lock!)
+      const isTwoStepActive = (!isCompoundMode && !isSkipTestMode && studyMode === 'twostep' && !learnedChars.has(targetChar));
+      const hideOutlineNow = isCompoundMode || isSkipTestMode || studyMode === 'blind' || (isTwoStepActive && twoStepPhase === 1);
+      const initMsg = isCompoundMode
+        ? `Chữ ${compoundStepIdx + 1}/${compoundChars.length}...`
+        : (isTwoStepActive
+            ? (twoStepPhase === 0 ? 'Bước 1/2: Tập nét mẫu...' : '🧠 Bước 2/2: Tự nhớ viết mù!')
+            : (hideOutlineNow ? 'Viết mù nét 1...' : 'Nét 1...'));
+      updateStrokeStatus(0, dictRef.strokeCount || 6, initMsg, 'normal');
 
       if (window.HanziWriter) {
         canvasEl.style.display = 'none';
@@ -3958,7 +4079,7 @@
             width: writerSize,
             height: writerSize,
             padding: 8,
-            showOutline: !isBlindMode,
+            showOutline: !hideOutlineNow,
             strokeAnimationSpeed: 1.2,
             delayBetweenStrokes: 150,
             strokeColor: isDark ? '#F8FAFC' : (isPaper ? '#292524' : '#1C1C1E'),
@@ -4022,6 +4143,16 @@
               updateStrokeStatus(strokeData.strokeNum, total, `Cần: ${expectedName}`, 'mistake');
             },
             onComplete: function(summaryData) {
+              // Smart 2-Step Memory Lock: Passo 1 (Guided) -> Passo 2 (Blind Active Recall)!
+              if (isTwoStepActive && twoStepPhase === 0) {
+                playSound('complete');
+                triggerHaptic('success');
+                twoStepPhase = 1;
+                showDynamicIsland(`🧠 Bước 2/2: Hãy tự viết lại "${targetChar}" từ trí nhớ!`, 'bg-[#007AFF]');
+                setTimeout(() => setupHanziWriter(), 360);
+                return;
+              }
+
               learnedChars.add(targetChar);
               localStorage.setItem('hm_learned', JSON.stringify([...learnedChars]));
               markDailyQuest('char');
@@ -4089,12 +4220,10 @@
       completedInSession.add(currentIndex);
       learnedChars.add(word.char);
       localStorage.setItem('hm_learned', JSON.stringify([...learnedChars]));
-      const todayIdx = (new Date().getDay() + 6) % 7;
-      weeklyActiveDays.add(todayIdx);
-      localStorage.setItem('hm_week_days', JSON.stringify([...weeklyActiveDays]));
+      const streakIncrementedToday = recordDailyStreakOnStudy();
 
-      // Award XP (+25 XP for Compound Challenge, +15 XP zero mistakes, else +10 XP)
-      const gainedXP = isCompoundMode ? 25 : (mistakes === 0 ? 15 : 10);
+      // Award XP (+25 XP Compound, +20 XP 2-Step Memory Lock, +15 XP zero mistakes, else +10 XP)
+      const gainedXP = isCompoundMode ? 25 : (twoStepPhase === 1 ? 20 : (mistakes === 0 ? 15 : 10));
       userXP += gainedXP;
       localStorage.setItem('hm_xp', String(userXP));
 
@@ -4107,16 +4236,15 @@
       const nextBtn = document.getElementById('modal-next-lesson-btn');
       const goalBanner = document.getElementById('modal-goal-banner');
 
+      if (streakIncrementedToday && goalBanner) {
+        goalBanner.innerText = `🔥 ĐÃ MỞ CHUỖI HỌC NGÀY THỨ ${userStreak}! Cố lên nhé!`;
+        goalBanner.classList.remove('hidden');
+      } else if (goalBanner) {
+        goalBanner.classList.add('hidden');
+      }
+
       if (allDeckDone) {
         setTimeout(() => { playSound('unlock'); triggerHaptic('heavy'); }, 220);
-        if (!wasLearned) {
-          userStreak += 1;
-          localStorage.setItem('hm_streak', String(userStreak));
-          if (userStreak > bestStreak) {
-            bestStreak = userStreak;
-            localStorage.setItem('hm_best_streak', String(bestStreak));
-          }
-        }
 
         const deckLessons = getDeckLessons(activeLessonDeck || userActiveDeck);
         if (isSkipTestMode) {
@@ -4221,16 +4349,39 @@
     }
 
     function prevWord() {
+      twoStepPhase = 0;
       currentIndex = currentIndex > 0 ? currentIndex - 1 : activeWords.length - 1;
       updateWordUI();
     }
 
     function nextWordManual() {
+      twoStepPhase = 0;
       currentIndex = (currentIndex + 1) % activeWords.length;
       updateWordUI();
     }
 
+    function animateWordCardSlide(dir, cb) {
+      const card = document.getElementById('word-card');
+      if (!card) { cb(); return; }
+      card.style.transform = `translate3d(${dir > 0 ? '-14px' : '14px'}, 0, 0)`;
+      card.style.opacity = '0.55';
+      setTimeout(() => {
+        cb();
+        card.style.transform = 'translate3d(0, 0, 0)';
+        card.style.opacity = '1';
+      }, 115);
+    }
+
+    function prevWordWithSlide() {
+      animateWordCardSlide(-1, prevWord);
+    }
+
+    function nextWordWithSlide() {
+      animateWordCardSlide(1, nextWordManual);
+    }
+
     function selectWordIndex(idx) {
+      twoStepPhase = 0;
       currentIndex = idx;
       updateWordUI();
     }
@@ -4325,19 +4476,40 @@
     function syncBlindButtonUI() {
       const btnBlind = document.getElementById('btn-blind');
       const blindText = document.getElementById('blind-text');
-      if (isBlindMode) {
-        btnBlind.className = 'px-3 py-1.5 rounded-2xl text-[11px] font-bold flex items-center gap-1.5 btn-primary-glass text-white transition active:scale-95 shrink-0';
-        blindText.innerText = 'Đang mù';
+      if (!btnBlind || !blindText) return;
+      if (isSkipTestMode || studyMode === 'blind') {
+        isBlindMode = true;
+        btnBlind.className = 'ios-press px-2 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 bg-indigo-600 text-white shrink-0';
+        blindText.innerText = '🙈 Viết mù';
+      } else if (studyMode === 'guided') {
+        isBlindMode = false;
+        btnBlind.className = 'ios-press px-2 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 bg-blue-500/12 text-[#007AFF] shrink-0';
+        blindText.innerText = '👁️ Nét mờ';
       } else {
-        btnBlind.className = 'px-3 py-1.5 rounded-2xl text-[11px] font-bold flex items-center gap-1.5 bg-blue-500/10 text-blue-600 transition active:scale-95 shrink-0';
-        blindText.innerText = 'Viết mù';
+        isBlindMode = false;
+        btnBlind.className = 'ios-press px-2 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1 btn-primary-glass text-white shrink-0';
+        blindText.innerText = '🎯 2 Bước';
       }
     }
 
-    function toggleBlindMode() {
-      isBlindMode = !isBlindMode;
+    function cycleWriteStudyMode() {
+      if (isSkipTestMode) return;
+      const order = ['twostep', 'blind', 'guided'];
+      studyMode = order[(order.indexOf(studyMode) + 1) % order.length];
+      localStorage.setItem('hm_study_mode', studyMode);
+      twoStepPhase = 0;
       syncBlindButtonUI();
       setupHanziWriter();
+      const labels = {
+        twostep: '🎯 Chế độ 2 Bước: Tập nét trước → Viết mù khóa trí nhớ!',
+        blind: '🙈 Chế độ Viết mù ngay lập tức',
+        guided: '👁️ Chế độ hiện nét mờ gợi ý'
+      };
+      showDynamicIsland(labels[studyMode], 'bg-[#007AFF]');
+    }
+
+    function toggleBlindMode() {
+      cycleWriteStudyMode();
     }
 
     function speakText(text, rate) {
@@ -4417,16 +4589,22 @@
 
       renderCompoundSlots();
 
+      twoStepPhase = 0;
       document.getElementById('guide-char').innerText = getActiveDrawChar();
       document.getElementById('radical-story').innerText = w.story;
+      const storyInlineEl = document.getElementById('word-story-inline');
+      const storyBoxEl = document.getElementById('word-story-inline-box');
+      if (storyInlineEl) storyInlineEl.innerText = w.story || `Hán Việt: ${w.hanviet} • ${w.meaning}`;
+      if (storyBoxEl) storyBoxEl.classList.toggle('hidden', isCompoundMode);
 
       document.getElementById('daily-progress-text').innerText = `${currentIndex + 1}/${activeWords.length}`;
       document.getElementById('progress-bar').style.width = (((currentIndex + 1) / activeWords.length) * 100) + '%';
       renderWordStrip();
 
       document.getElementById('radical-badges').innerHTML = (w.radicals || []).map(r => `
-        <span class="${fontClass} font-extrabold text-xs text-slate-700" title="${r.title}">${r.text}</span>
-      `).join('<span class="opacity-40">+</span>');
+        <span class="${fontClass} font-extrabold text-xs text-slate-700">${r.text}</span>
+        ${r.title ? `<span class="text-[10px] text-[#8E8E93] font-semibold">${r.title}</span>` : ''}
+      `).join('<span class="opacity-40 mx-0.5">+</span>');
 
       document.getElementById('collocations-list').innerHTML = (w.collocations && w.collocations.length)
         ? w.collocations.map(c => {
@@ -5124,7 +5302,10 @@
       unlockedLessons = new Set();
       srsDB = {};
       userXP = 0;
-      userStreak = 1;
+      userStreak = 0;
+      bestStreak = 0;
+      lastStudyDate = '';
+      weeklyActiveDays = new Set();
       totalCorrectStrokes = 0;
       totalMistakeStrokes = 0;
       localStorage.setItem('hm_learned', '[]');
@@ -5132,7 +5313,10 @@
       localStorage.setItem('hm_unlocked_lessons', '[]');
       localStorage.setItem('hm_srs_db', '{}');
       localStorage.setItem('hm_xp', '0');
-      localStorage.setItem('hm_streak', '1');
+      localStorage.setItem('hm_streak', '0');
+      localStorage.setItem('hm_best_streak', '0');
+      localStorage.removeItem('hm_last_study_date');
+      localStorage.setItem('hm_week_days', '[]');
       localStorage.setItem('hm_ok_strokes', '0');
       localStorage.setItem('hm_err_strokes', '0');
       if (lbl) lbl.innerText = 'Đặt lại toàn bộ tiến độ học tập';
@@ -5205,6 +5389,28 @@
         hdr.addEventListener('touchend', finish, { passive: true });
         hdr.addEventListener('touchcancel', finish, { passive: true });
       });
+
+      // 4. Horizontal One-Hand Swipe on #word-card to jump Prev / Next Character!
+      const wCard = document.getElementById('word-card');
+      if (wCard) {
+        let wx0 = 0, wy0 = 0, wTracking = false;
+        wCard.addEventListener('touchstart', (ev) => {
+          if (ev.touches.length !== 1 || ev.target.closest('button')) return;
+          wTracking = true;
+          wx0 = ev.touches[0].clientX;
+          wy0 = ev.touches[0].clientY;
+        }, { passive: true });
+        wCard.addEventListener('touchend', (ev) => {
+          if (!wTracking || !ev.changedTouches.length) return;
+          wTracking = false;
+          const dx = ev.changedTouches[0].clientX - wx0;
+          const dy = Math.abs(ev.changedTouches[0].clientY - wy0);
+          if (Math.abs(dx) > 42 && Math.abs(dx) > dy * 1.4) {
+            if (dx < 0) nextWordWithSlide();
+            else prevWordWithSlide();
+          }
+        }, { passive: true });
+      }
 
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden && ambientEnabled) syncAmbientMusic();

@@ -57,8 +57,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view v2.0.1 >/dev/null 2>&1; then
-            gh release upload v2.0.1 JiangZi.apk --clobber
+          if gh release view v2.2.0 >/dev/null 2>&1; then
+            gh release upload v2.2.0 JiangZi.apk --clobber
           else
-            gh release create v2.0.1 JiangZi.apk --title "JiangZi v2.0.1 Turbo (120fps + Clean Pill UI + Offline + Sound Studio)" --notes "Bản vá lỗi sọc dọc thanh điều hướng & tối ưu khung toàn màn hình 120fps cho Android."
+            gh release create v2.2.0 JiangZi.apk --title "JiangZi v2.2.0 Hoàn Thiện (Hero UI + 2 Bước Viết Mù + 767 Bộ Thủ Thật + 120fps)" --notes "Bản hoàn thiện toàn diện JiangZi v2.2.0: Giao diện Hero Thư Pháp, Icon đặc ruột, Mẹo nhớ Chiết tự trực quan, Vuốt 1 tay chuyển chữ, Chế độ 2 Bước Khóa Trí Nhớ, Chuỗi Streak ngày lịch thật & Đồng bộ Ban đêm 100%."
           fi

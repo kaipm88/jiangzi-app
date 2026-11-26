@@ -264,9 +264,25 @@ window.JIANGZI_PINYIN_QUIZ = [
     const cMn = parts[2] || mn;
 
     const existing = richCharMap.get(ch);
+    const meta = (window.JIANGZI_CHAR_META && window.JIANGZI_CHAR_META[ch]) || null;
     if (existing) {
-      return { ...existing, level: levelLabel };
+      return {
+        ...existing,
+        level: levelLabel,
+        strokeCount: meta ? meta.c : existing.strokeCount,
+        strokeNames: (existing.strokeNames && existing.strokeNames.length) ? existing.strokeNames : (meta ? meta.sn : [])
+      };
     }
+
+    const radObj = (meta && meta.r)
+      ? { text: meta.r[0], title: meta.r[1] }
+      : { text: ch, title: hv };
+
+    const smartStory = (meta && meta.r && meta.r[0] !== ch)
+      ? `Gốc bộ ${meta.r[0]} (${meta.r[1]}) • Hán Việt "${hv}" → Ghép: ${cWord} (${cPy} - ${cMn})`
+      : (levelLabel === '214 Bộ thủ'
+          ? `Bộ thủ "${hv}" (${mn}) → Gặp trong từ: ${cWord} (${cPy} - ${cMn})`
+          : `Hán Việt "${hv}" (${mn}) → Từ hay dùng: ${cWord} (${cPy} - ${cMn})`);
 
     return {
       char: ch,
@@ -274,19 +290,19 @@ window.JIANGZI_PINYIN_QUIZ = [
       hanviet: hv,
       meaning: mn,
       level: levelLabel,
-      strokeCount: 6,
-      radicals: [{ text: ch, title: hv }],
-      story: `Âm Hán Việt: ${hv} — Nghĩa gốc: ${mn}`,
-      strokeNames: [],
+      strokeCount: meta ? meta.c : 6,
+      radicals: [radObj],
+      story: smartStory,
+      strokeNames: meta ? meta.sn : [],
       collocations: [{ hanzi: cWord, pinyin: cPy, meaning: cMn }],
-      sentences: [{ hanzi: `词汇：${cWord}`, pinyin: cPy, meaning: `Từ vựng trọng tâm: ${cMn}` }],
+      sentences: [{ hanzi: `“${cWord}”这个词很常用。`, pinyin: `"${cPy}" zhège cí hěn chángyòng.`, meaning: `Từ “${cWord}” (${cMn}) rất thông dụng trong giao tiếp.` }],
       compound: {
         word: cWord,
         pinyin: cPy,
         meaning: cMn,
-        sentence: `Từ ghép thực tế: ___`,
-        full: cWord,
-        vi: cMn
+        sentence: `“___”这个词很常用。`,
+        full: `“${cWord}”这个词很常用。`,
+        vi: `Từ “${cWord}” (${cMn}) rất thông dụng.`
       }
     };
   }
