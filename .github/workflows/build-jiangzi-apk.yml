@@ -25,8 +25,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: |
+          export ANDROID_SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          yes | "$ANDROID_SDK_ROOT"/cmdline-tools/*/bin/sdkmanager --licenses >/dev/null 2>&1 || true
 
       - name: Sync latest hanzi_web into Android assets
         run: |
