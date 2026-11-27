@@ -1,10 +1,16 @@
 package vn.donggiang.jiangzi
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -16,11 +22,14 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.webkit.WebViewAssetLoader
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 
@@ -28,15 +37,28 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     private lateinit var webView: WebView
     private var tts: TextToSpeech? = null
     private var ttsReady = false
+    private var speechRecognizer: SpeechRecognizer? = null
+    private var pendingSpeechStart = false
     private val prefsName = "JiangZiStorageBackup_v1"
     private var safeTopPx = 0
     private var safeBottomPx = 0
+
+    private val micPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted && pendingSpeechStart) {
+            pendingSpeechStart = false
+            beginNativeSpeechListening()
+        } else if (!granted) {
+            pendingSpeechStart = false
+            sendSpeechError("Bạn cần cho phép quyền Micro để chấm phát âm tiếng Trung.")
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // True Edge-to-Edge Fullscreen on Android (90Hz/120Hz ready)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -52,7 +74,6 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
             .build()
 
         webView = WebView(this).apply {
-            // Force GPU Hardware Layer for locked 60/90/120fps scrolling & transitions
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             setBackgroundColor(Color.parseColor("#EAF0F8"))
             overScrollMode = WebView.OVER_SCROLL_NEVER
@@ -85,7 +106,6 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
             }
         }
 
-        // Measure system status bar / camera cutout & gesture bar and pass to CSS --safe-top / --safe-bottom
         ViewCompat.setOnApplyWindowInsetsListener(webView) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val density = resources.displayMetrics.density.coerceAtLeast(1f)
@@ -109,6 +129,65 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                 }
             }
         })
+    }
+
+    private fun beginNativeSpeechListening() {
+        runOnUiThread {
+            try {
+                tts?.stop()
+                speechRecognizer?.destroy()
+                speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this@MainActivity).apply {
+                    setRecognitionListener(object : RecognitionListener {
+                        override fun onReadyForSpeech(params: Bundle?) {
+                            webView.evaluateJavascript("window.__onNativeSpeechState && window.__onNativeSpeechState('listening')", null)
+                        }
+                        override fun onBeginningOfSpeech() {}
+                        override fun onRmsChanged(rmsdB: Float) {}
+                        override fun onBufferReceived(buffer: ByteArray?) {}
+                        override fun onEndOfSpeech() {}
+                        override fun onError(error: Int) {
+                            val msg = when (error) {
+                                SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Chưa nghe rõ tiếng Trung, bạn đọc to và rõ hơn nhé!"
+                                SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Cần kết nối mạng để nhận diện giọng nói."
+                                else -> "Không nhận diện được giọng nói (mã $error)."
+                            }
+                            sendSpeechError(msg)
+                        }
+                        override fun onResults(results: Bundle?) {
+                            val list = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) ?: arrayListOf()
+                            sendSpeechCandidates(list, true)
+                        }
+                        override fun onPartialResults(partialResults: Bundle?) {
+                            val list = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) ?: arrayListOf()
+                            if (list.isNotEmpty()) sendSpeechCandidates(list, false)
+                        }
+                        override fun onEvent(eventType: Int, params: Bundle?) {}
+                    })
+                }
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-CN")
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "zh-CN")
+                    putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                    putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 4)
+                }
+                speechRecognizer?.startListening(intent)
+            } catch (e: Exception) {
+                sendSpeechError("Thiết bị chưa bật dịch vụ nhận diện giọng nói của Google.")
+            }
+        }
+    }
+
+    private fun sendSpeechCandidates(list: List<String>, isFinal: Boolean) {
+        val arr = JSONArray(list)
+        val js = "window.__onNativeSpeechCandidates && window.__onNativeSpeechCandidates(${arr}, $isFinal);"
+        runOnUiThread { webView.evaluateJavascript(js, null) }
+    }
+
+    private fun sendSpeechError(msg: String) {
+        val q = JSONObject.quote(msg)
+        val js = "window.__onNativeSpeechError && window.__onNativeSpeechError($q);"
+        runOnUiThread { webView.evaluateJavascript(js, null) }
     }
 
     private fun applySafeInsetsToCss() {
@@ -179,6 +258,7 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     }
 
     override fun onDestroy() {
+        speechRecognizer?.destroy()
         tts?.stop()
         tts?.shutdown()
         super.onDestroy()
@@ -190,6 +270,25 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
             if (ttsReady && text.isNotBlank()) {
                 tts?.setSpeechRate(rate.toFloat().coerceIn(0.45f, 1.5f))
                 tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "jz_utt")
+            }
+        }
+
+        @JavascriptInterface
+        fun startListening() {
+            runOnUiThread {
+                if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    beginNativeSpeechListening()
+                } else {
+                    pendingSpeechStart = true
+                    micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun stopListening() {
+            runOnUiThread {
+                try { speechRecognizer?.stopListening() } catch (_: Exception) {}
             }
         }
 

@@ -1,5 +1,5 @@
 // JiangZi v2.0 Offline Service Worker (100% self-contained: CSS, HanziWriter, 1,015 Stroke JSONs & 149 Lessons)
-const CACHE_NAME = 'jiangzi-mobile-v2.2.0';
+const CACHE_NAME = 'jiangzi-mobile-v2.3.0';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const CORE_ASSETS = [
   './data/bank_hsk1.js',
   './data/bank_hsk2_9.js',
   './data/char_meta.js',
+  './data/sentence_builder_bank.js',
   './data/strokes_offline.js',
   './splash_bamboo_bg.jpg',
   './icons/apple-touch-icon.png',
