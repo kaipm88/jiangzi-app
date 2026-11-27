@@ -57,8 +57,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view v2.3.0 >/dev/null 2>&1; then
-            gh release upload v2.3.0 JiangZi.apk --clobber
+          if gh release view v2.4.0 >/dev/null 2>&1; then
+            gh release upload v2.4.0 JiangZi.apk --clobber
           else
-            gh release create v2.3.0 JiangZi.apk --title "JiangZi v2.3.0 Pro Core (Chấm Phát Âm Micro + Ghép Câu + Văn Phòng Tứ Bảo + Thẻ Ấn Triện)" --notes "Bản nâng cấp Nấc 1 Thương Mại (v2.3.0): Chấm phát âm tiếng Trung qua Micro thật, Lắp ghép câu & Mẹo ngữ pháp 10s, Tiệm Văn Phòng Tứ Bảo đổi Ngọc Hộ Mệnh giữ Streak & 4 Màu Mực Quý, Xuất Thẻ Ấn Triện Thủy Mặc chia sẻ thành tích."
+            gh release create v2.4.0 JiangZi.apk --title "JiangZi v2.4.0 Hands-Free Voice (Tự Chốt 0.3s + Sóng Âm + Đọc Câu Ví Dụ)" --notes "Bản nâng cấp trải nghiệm giọng nói v2.4.0: Gỡ đè nút trên thẻ đề bài, đưa nút Đọc lớn xuống thanh công cụ đáy ô viết, thu âm 1 chạm tự động chốt kết quả trong 0.3s không cần bấm dừng, thêm nút Đọc thưởng +15 XP trên bảng hoàn thành và đọc cả câu ví dụ."
           fi

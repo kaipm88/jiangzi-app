@@ -170,6 +170,9 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                     putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "zh-CN")
                     putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                     putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 4)
+                    putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 850L)
+                    putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 650L)
+                    putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 350L)
                 }
                 speechRecognizer?.startListening(intent)
             } catch (e: Exception) {
@@ -288,7 +291,11 @@ class MainActivity : ComponentActivity(), TextToSpeech.OnInitListener {
         @JavascriptInterface
         fun stopListening() {
             runOnUiThread {
-                try { speechRecognizer?.stopListening() } catch (_: Exception) {}
+                try {
+                    speechRecognizer?.cancel()
+                    speechRecognizer?.destroy()
+                    speechRecognizer = null
+                } catch (_: Exception) {}
             }
         }
 
